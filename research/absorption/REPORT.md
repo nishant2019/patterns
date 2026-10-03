@@ -302,3 +302,40 @@ information; the only labels that stand out are Roll-4 ABSORBED selling and
 day-level AGAINST (price moved opposite to the net delta since the open),
 about +0.04% to +0.06% above baseline. The chart is for reading who is in
 control, not for generating signals.
+
+---
+
+## CVD swing marker on the candle chart
+
+Added to `efficiency_chart.py`: a diamond above the price candle and a **CVD
+swing** chip row. Swing = `high_cvd − low_cvd` as a % of the stock-day's
+average bar volume, ranked against all 30,400 bars. **TWO-WAY** (filled
+diamond) = top-20% swing whose net delta is <= 30% of the swing, i.e. heavy
+flow in both directions that netted out; **SWING** (outline) = top-20% swing
+that ended one-sided. Tooltips give the CVD excursion below and above the bar's
+open.
+
+The swing is measured against the day's average bar volume (not the bar's
+own volume) because a very high-volume bar otherwise hides its own swing:
+DABUR's 14:15 bar (volume 4.1x, CVD −65K inside, net −3K) is only p60 on this
+scale, so it is **not** flagged; the flagged bars are the larger swings
+relative to the stock's normal size.
+
+Do flagged bars predict? (vs the median stock, baseline +0.03% / +0.055%)
+
+| Bars | Count | Next 2 bars | To close |
+|---|---|---|---|
+| TWO-WAY | 287 (1%) | +0.06% | +0.05% (t 0.8) |
+| SWING (one-sided) | 4,239 (14%) | +0.00% | +0.01% (t 0.5) |
+| TWO-WAY, CVD dipped below open and recovered | 130 | +0.07% | **+0.16%** (t 2.3, 5/6 days) |
+| TWO-WAY, CVD spiked above open and faded | 157 | +0.05% | −0.05% (t −0.6) |
+
+Overall the marker carries no edge. The one hint, a recovered CVD dip
+(sell push absorbed) followed by about +0.1% over baseline, is small and has
+130 events.
+
+Examples (28-09): `charts/TCS_…`, `AUROPHARMA_…`, `DABUR_…`, `IREDA_…`
+(IREDA's 12:15 bar is TWO-WAY: CVD ran +509K above and −169K below its open on
+7.2x the master's volume and finished −146K; the stock then ran out of buyers
+and CVD fell from +654K to −109K by 14:45 while price stayed above the master
+range).

@@ -9,7 +9,10 @@ all stocks and days), so the labels are balanced by construction:
   AGAINST  price moved opposite to the delta
   -        |net delta| < 10% of volume: not classified
 D = net delta % of volume, P = price move in master-bar ranges.
-Rows:  Bar = this candle alone | Roll 4 = last 4 bars | Since 09:45 = day so far after the opening bar.
+Rows:  Bar = this candle alone | Roll 4 = last 4 bars | Since 09:45 = day so far after the opening bar | CVD swing.
+CVD swing marker (diamond above the price candle and a chip in the last row): swing = (high_cvd - low_cvd) as % of
+the stock-day's average bar volume, ranked vs all bars.  TWO-WAY = top-20% swing whose net delta is <= 30% of the swing (heavy flow in
+both directions that netted out); SWING = top-20% swing that ended one-sided.
 
 Usage:
     python efficiency_chart.py TCS 28-09-2026 [-o chart.html] [--png chart.png]
@@ -35,12 +38,16 @@ def window(d, a, t):
 def peer_tables():
     """For each window kind, sorted |P| of all peers grouped by |D| decile (peers = windows with |D| >= DMIN)."""
     pts = {k: [] for k in ("bar", "roll", "day")}
+    swings = []
     for folder in sorted(glob.glob(os.path.join(HERE, "..", "..", "data", "CVD_Scanner_*"))):
         for p in glob.glob(os.path.join(folder, "*.csv")):
             try: d = load(p)
             except ValueError: continue
             n = len(d["close_price"])
             if (d["high_price"][0] - d["low_price"][0]) <= 0: continue
+            avgv = sum(d["volume"]) / n
+            for t in range(n):
+                swings.append((d["high_cvd"][t] - d["low_cvd"][t]) / avgv * 100)
             for t in range(1, n):
                 pts["bar"].append(window(d, t, t)[:2])
                 if t >= 3:
@@ -54,7 +61,18 @@ def peer_tables():
         groups = [[] for _ in range(10)]
         for ad, ap in v: groups[bisect.bisect(edges, ad)].append(ap)
         tables[k] = (edges, [sorted(g) for g in groups])
+    tables["swing"] = sorted(swings)
     return tables
+
+
+def swing_state(b, table, avgv):
+    """(label, swing %, percentile, net/swing ratio) for one bar. Swing is measured against the stock-day's average
+    bar volume, so a high-volume bar is not penalised for its size."""
+    rng = b["ch"] - b["cl"]
+    pct = 100 * bisect.bisect(table, rng / avgv * 100) / len(table)
+    ratio = abs(b["cc"] - b["co"]) / rng if rng > 0 else 1.0
+    lab = "-" if pct < 80 else ("TWO-WAY" if ratio <= 0.30 else "SWING")
+    return lab, rng / avgv * 100, pct, ratio
 
 
 def state(D, P, table):
@@ -80,6 +98,7 @@ def build(sym, date, tables):
         else: b["bar"] = state(D, P, tables["bar"])
         b["roll"] = state(*window(d, i - 3, i)[:2], tables["roll"]) if i >= 3 else ("", None)
         b["day"] = state(*window(d, 1, i)[:2], tables["day"]) if i >= 3 else ("", None)
+        b["sw"] = swing_state(b, tables["swing"], sum(V) / n)
         bars.append(b)
     return d, bars
 
@@ -92,8 +111,8 @@ def render(sym, date, bars):
     pmax, pmin = max(b["h"] for b in bars), min(b["l"] for b in bars)
     pad = (pmax - pmin) * .06; pmax += pad; pmin -= pad
     P0, P1 = 82, 340          # price panel
-    C0, C1 = 370, 525         # CVD panel
-    D0, D1 = 555, 650         # delta panel
+    C0, C1 = 376, 525         # CVD panel
+    D0, D1 = 562, 652         # delta panel
     E0 = 680                  # efficiency strip start
     py = lambda v: P1 - (v - pmin) / (pmax - pmin) * (P1 - P0)
     cmax = max(max(b["ch"] for b in bars), 0); cmin = min(min(b["cl"] for b in bars), 0); cp = (cmax - cmin) * .08
@@ -117,10 +136,16 @@ def render(sym, date, bars):
         x = X(b["i"]); up = b["c"] >= b["o"]; cls = "up" if up else "dn"
         tip = (f'{b["t"]}  O {b["o"]:g} H {b["h"]:g} L {b["l"]:g} C {b["c"]:g}  ret {b["ret"]:+.2f}%  delta {b["delta"]/1000:+.1f}K ({b["D"]:+.0f}% of vol)  '
                f'bar efficiency {b["bar"][0]}{"" if b["bar"][1] is None else " (p%d)" % round(b["bar"][1])}')
-        s.append(f'<g><title>{tip}</title><line x1="{x:.1f}" x2="{x:.1f}" y1="{py(b["h"]):.1f}" y2="{py(b["l"]):.1f}" class="w {cls}"/>'
+        swl, swp, swpc, swr = b["sw"]
+        tip += f'  |  CVD swing {swp:.0f}% of avg bar volume (p{swpc:.0f}); CVD fell {(b["co"]-b["cl"])/1000:.1f}K below open, rose {(b["ch"]-b["co"])/1000:.1f}K above; net {b["delta"]/1000:+.1f}K ({swr*100:.0f}% of swing) [{swl}]'
+        mark = ""
+        if swl != "-":
+            mx, my = x, py(b["h"]) - 12
+            mark = f'<polygon points="{mx:.1f},{my-6:.1f} {mx+6:.1f},{my:.1f} {mx:.1f},{my+6:.1f} {mx-6:.1f},{my:.1f}" class="mk {"two" if swl=="TWO-WAY" else "one"}"/>'
+        s.append(f'<g><title>{tip}</title>{mark}<line x1="{x:.1f}" x2="{x:.1f}" y1="{py(b["h"]):.1f}" y2="{py(b["l"]):.1f}" class="w {cls}"/>'
                  f'<rect x="{x-bw/2:.1f}" y="{py(max(b["o"], b["c"])):.1f}" width="{bw:.1f}" height="{max(abs(py(b["o"])-py(b["c"])), 1):.1f}" class="c {cls}"/></g>')
     # CVD panel
-    s.append(f'<rect x="{left}" y="{C0}" width="{W-left-right}" height="{C1-C0}" class="pbox"/><text x="{left+6}" y="{C0+14}" class="pan">CVD (open/high/low/close)</text>')
+    s.append(f'<rect x="{left}" y="{C0}" width="{W-left-right}" height="{C1-C0}" class="pbox"/><text x="{left}" y="{C0-6}" class="pan">CVD candles (open / high / low / close)</text>')
     s.append(f'<line x1="{left}" x2="{W-right}" y1="{cy(0):.1f}" y2="{cy(0):.1f}" class="zero"/>')
     for k in (cmin, cmax):
         s.append(f'<text x="{left-8}" y="{cy(k)+4:.1f}" class="ax" text-anchor="end">{k/1000:+.0f}K</text>')
@@ -130,7 +155,7 @@ def render(sym, date, bars):
                  f'<line x1="{x:.1f}" x2="{x:.1f}" y1="{cy(b["ch"]):.1f}" y2="{cy(b["cl"]):.1f}" class="w {cls}"/>'
                  f'<rect x="{x-bw/2:.1f}" y="{cy(max(b["co"], b["cc"])):.1f}" width="{bw:.1f}" height="{max(abs(cy(b["co"])-cy(b["cc"])), 1):.1f}" class="c {cls}"/></g>')
     # delta panel (bars coloured by this bar's efficiency state)
-    s.append(f'<rect x="{left}" y="{D0}" width="{W-left-right}" height="{D1-D0}" class="pbox"/><text x="{left+6}" y="{D0+14}" class="pan">Bar delta (colour = bar efficiency)</text>')
+    s.append(f'<rect x="{left}" y="{D0}" width="{W-left-right}" height="{D1-D0}" class="pbox"/><text x="{left}" y="{D0-6}" class="pan">Bar delta (colour = bar efficiency)</text>')
     s.append(f'<line x1="{left}" x2="{W-right}" y1="{dy(0):.1f}" y2="{dy(0):.1f}" class="zero"/>')
     for b in bars:
         x = X(b["i"]); y0, y1 = dy(0), dy(b["delta"]); fill = dict(STATES).get(b["bar"][0], "var(--none)")
@@ -147,28 +172,41 @@ def render(sym, date, bars):
                 continue
             fill = "var(--master)" if st_ == "MASTER" else dict(STATES)[st_]
             s.append(f'<g><title>{b["t"]} {lab}: {st_}{"" if de is None else f" (percentile {de:.0f} among peers with similar delta)"}</title><rect x="{x-step*.46:.1f}" y="{y}" width="{step*.92:.1f}" height="38" rx="4" style="fill:{fill}"/>'
-                     f'<text x="{x:.1f}" y="{y+16}" class="chip" text-anchor="middle">{st_}</text>'
-                     f'<text x="{x:.1f}" y="{y+31}" class="chip2" text-anchor="middle">{"" if de is None else "p%d" % round(de)}</text></g>')
+                     f'<text x="{x:.1f}" y="{y+16}" class="chip{" n" if st_ == "-" else ""}" text-anchor="middle">{st_}</text>'
+                     f'<text x="{x:.1f}" y="{y+31}" class="chip2{" n" if st_ == "-" else ""}" text-anchor="middle">{"" if de is None else "p%d" % round(de)}</text></g>')
+    y = E0 + 150
+    s.append(f'<text x="{left-8}" y="{y+22}" class="pan" text-anchor="end">CVD swing</text>')
     for b in bars:
-        s.append(f'<text x="{X(b["i"]):.1f}" y="{E0+156}" class="ax" text-anchor="middle">{b["t"]}</text>')
+        swl, swp, swpc, swr = b["sw"]; x = X(b["i"])
+        fill = {"TWO-WAY": "var(--swing)", "SWING": "var(--norm)", "-": "var(--none)"}[swl]
+        s.append(f'<g><title>{b["t"]} CVD swing {swp:.0f}% of avg bar volume (p{swpc:.0f}); net {swr*100:.0f}% of swing: {swl}</title><rect x="{x-step*.46:.1f}" y="{y}" width="{step*.92:.1f}" height="38" rx="4" style="fill:{fill}"/>'
+                 f'<text x="{x:.1f}" y="{y+16}" class="chip{" n" if swl == "-" else ""}" text-anchor="middle">{swl}</text>'
+                 f'<text x="{x:.1f}" y="{y+31}" class="chip2{" n" if swl == "-" else ""}" text-anchor="middle">{swp:.0f}% p{swpc:.0f}</text></g>')
+    for b in bars:
+        s.append(f'<text x="{X(b["i"]):.1f}" y="{E0+206}" class="ax" text-anchor="middle">{b["t"]}</text>')
     # legend
-    lx = left; ly = E0 + 182
+    lx = left; ly = E0 + 232
     for name, var, desc in (("STRONG", "var(--over)", "top third of peers"), ("NORM", "var(--norm)", "middle third"), ("ABSORBED", "var(--ineff)", "bottom third"),
                             ("AGAINST", "var(--against)", "price opposed delta"), ("-", "var(--none)", "|delta| < 10%")):
         s.append(f'<rect x="{lx}" y="{ly-10}" width="14" height="14" rx="3" style="fill:{var}"/><text x="{lx+20}" y="{ly+2}" class="lg">{name}: {desc}</text>')
         lx += 190
-    s.append(f'<text x="{left}" y="{ly+26}" class="sub">Efficiency = price move for the delta, ranked vs peers with similar |delta| (p = percentile). ABSORBED = delta did little; STRONG = delta moved price a lot.</text>')
-    H_ = E0 + 240
+    ly += 22; lx = left
+    s.append(f'<polygon points="{lx+6},{ly-10} {lx+12},{ly-4} {lx+6},{ly+2} {lx},{ly-4}" class="mk two"/><text x="{lx+20}" y="{ly+2}" class="lg">TWO-WAY swing: heavy CVD swing that netted out (marker above the candle)</text>')
+    s.append(f'<polygon points="{lx+526},{ly-10} {lx+532},{ly-4} {lx+526},{ly+2} {lx+520},{ly-4}" class="mk one"/><text x="{lx+540}" y="{ly+2}" class="lg">one-sided large swing</text>')
+    s.append(f'<text x="{left}" y="{ly+28}" class="sub">Efficiency = price move for the delta, ranked vs peers with similar |delta| (p = percentile). ABSORBED = delta did little; STRONG = delta moved price a lot.</text>')
+    s.append(f'<text x="{left}" y="{ly+46}" class="sub">CVD swing = (high CVD - low CVD) as % of the stock-day average bar volume, ranked vs all bars; TWO-WAY = top-20% swing that netted to 30% of itself or less.</text>')
+    H_ = E0 + 345
     css = """
-:root{--bg:#fff;--fg:#1f2430;--mut:#6b7280;--grid:#e5e7eb;--box:#f8fafc;--band:#2563eb18;--up:#14a085;--dn:#e0463f;--over:#3b82f6;--norm:#9ca3af;--ineff:#f59e0b;--against:#e11d74;--none:#e5e7eb;--master:#6366f1;--chipfg:#fff}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f141c;--fg:#e5e7eb;--mut:#94a3b8;--grid:#243040;--box:#131a24;--band:#3b82f622;--up:#2dd4a4;--dn:#f87171;--over:#3b82f6;--norm:#6b7280;--ineff:#f59e0b;--against:#ec4899;--none:#2a3441;--master:#6366f1}}
+:root{--bg:#fff;--fg:#1f2430;--mut:#6b7280;--grid:#e5e7eb;--box:#f8fafc;--band:#2563eb18;--up:#14a085;--dn:#e0463f;--over:#3b82f6;--norm:#9ca3af;--ineff:#f59e0b;--against:#e11d74;--none:#e5e7eb;--master:#6366f1;--chipfg:#fff;--swing:#9333ea}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f141c;--fg:#e5e7eb;--mut:#94a3b8;--grid:#243040;--box:#131a24;--band:#3b82f622;--up:#2dd4a4;--dn:#f87171;--over:#3b82f6;--norm:#6b7280;--ineff:#f59e0b;--against:#ec4899;--none:#2a3441;--master:#6366f1;--swing:#c084fc}}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
 svg{max-width:100%;height:auto;display:block;margin:0 auto}
 .title{font-size:20px;font-weight:700;fill:var(--fg)}.sub{font-size:12px;fill:var(--mut)}.ax{font-size:11px;fill:var(--mut)}.pan{font-size:12px;font-weight:600;fill:var(--mut)}
 .lbl{font-size:11px;fill:var(--mut)}.grid{stroke:var(--grid);stroke-width:1}.zero{stroke:var(--mut);stroke-width:1;stroke-dasharray:3 3;opacity:.6}.pbox{fill:var(--box);stroke:var(--grid)}
 .band{fill:var(--band)}.mline{stroke:#2563eb;stroke-width:1;stroke-dasharray:5 4;opacity:.7}
 .up{stroke:var(--up)}rect.up{fill:var(--up)}.dn{stroke:var(--dn)}rect.dn{fill:var(--dn)}.w{stroke-width:1.5}
-.chip{font-size:11px;font-weight:700;fill:#fff}.chip2{font-size:11px;fill:#fff;opacity:.95}.dl{font-size:10px;fill:var(--mut)}.lg{font-size:11px;fill:var(--fg)}
+.mk{stroke:var(--swing);stroke-width:2}.mk.two{fill:var(--swing)}.mk.one{fill:none}
+.chip{font-size:11px;font-weight:700;fill:#fff}.chip2{font-size:11px;fill:#fff;opacity:.95}.chip.n,.chip2.n{fill:var(--mut)}.dl{font-size:10px;fill:var(--mut)}.lg{font-size:11px;fill:var(--fg)}
 """
     return (f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{sym} {date} delta efficiency</title><style>{css}</style></head><body>'
             f'<svg viewBox="0 0 {W} {H_}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{sym} candles with CVD and delta efficiency labels">{"".join(s)}</svg></body></html>')
@@ -186,7 +224,7 @@ def main():
     print("wrote", out)
     if a.png:
         chrome = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
-        subprocess.run([chrome, "--headless=new", "--no-sandbox", "--disable-gpu", "--hide-scrollbars", f"--screenshot={a.png}", "--window-size=1160,1010", "file://" + os.path.abspath(out)], check=True, capture_output=True)
+        subprocess.run([chrome, "--headless=new", "--no-sandbox", "--disable-gpu", "--hide-scrollbars", f"--screenshot={a.png}", "--window-size=1160,1130", "file://" + os.path.abspath(out)], check=True, capture_output=True)
         print("wrote", a.png)
 
 
