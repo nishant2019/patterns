@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 research/absorption/events.csv
 research/absorption/_dp.pkl
+research/absorption/_de.pkl

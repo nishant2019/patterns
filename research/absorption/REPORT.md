@@ -198,3 +198,55 @@ effect consistent with the selling-absorption result above.
 
 A linear model of bar move on delta % explains only 15% of bar-to-bar price
 movement (R² 0.15), too weak to give a per-candle "expected move".
+
+---
+
+## Delta efficiency (`delta_efficiency.py`)
+
+How much price movement does the delta actually produce? For a window of
+bars, `D` = net delta as % of window volume, `P` = price move in master-bar
+ranges, `beta` = pooled slope of P on D (24,304 windows; correlation 0.40
+rolling, 0.42 since 09:45). **Delta efficiency DE = P / (beta × D)**:
+
+| DE | Meaning |
+|---|---|
+| > 1.5 | over-efficient: price ran further than that delta normally buys |
+| 0.5 – 1.5 | normal |
+| 0 – 0.5 | inefficient: delta mostly absorbed |
+| <= 0 | price moved **against** the delta |
+
+Only windows with |D| >= 10% are classified. Two views: **rolling** (last 4
+bars) and **day-to-date** (since the 09:45 open, i.e. after the opening bar).
+`python delta_efficiency.py show TCS 28-09-2026` prints both series for any
+stock-day.
+
+**TCS 28-09:** rolling DE was over-efficient (2.0–3.0) from 11:45 to 13:15
+as +11% to +26% delta lifted price +0.7% to +1.2%; it fell to normal (0.75)
+at 13:45 and to **−0.49 (against delta)** at 14:15 when +13.5% delta came with
+price down 0.13%. Since-09:45 efficiency stayed over-efficient to 13:45
+(2.1–2.3) and dropped to normal (1.3) at 14:15. So the delta was efficient
+while the range was being built and stopped being efficient near the top.
+
+**Does efficiency predict anything?** (vs the median stock, next 2 bars / to
+close; baseline +0.03% / +0.05%)
+
+| Window | State | Delta selling: to close | Delta buying: to close |
+|---|---|---|---|
+| Rolling 4 bars | against delta | **+0.09%** (t 4.1, 5/6 days) | +0.03% |
+| | inefficient | +0.09% (6/6) | −0.02% |
+| | over-efficient | +0.07% | +0.01% |
+| Since 09:45 | **against delta** | **+0.14%** (t 6.0, 5/6) | **+0.09%** (t 3.5, 6/6) |
+| | inefficient | +0.03% | −0.01% |
+| | normal | −0.04% (t −2.1) | +0.05% |
+| | over-efficient | +0.01% | −0.03% |
+
+- The one state that stands out is **day-to-date delta efficiency <= 0** (price
+  has moved opposite to the net delta since the open): both sides beat the
+  baseline by about +0.05% to +0.10% to the close. It is positive for selling
+  (price held up despite sellers) and for buying (price fell despite buyers),
+  so it behaves like "a divergence between day delta and day price", not a
+  directional signal.
+- Over-efficient delta (price following delta strongly) shows no continuation.
+- The effect sizes (about 0.1%) are small, similar to the earlier absorption
+  results, and the rolling buckets are not monotone. Efficiency is a useful
+  descriptive read of who is in control, but not a stand-alone edge.
