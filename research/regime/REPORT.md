@@ -165,3 +165,16 @@ were roughly flat against the market on average.
   only 1 of 6 days).
 - Stocks that were in A and fell back to B still beat the median (+0.28%), so
   leaving A is not by itself a reason to drop the idea.
+
+---
+
+## Update: 29-09-2026 added (7 days, out of sample, nothing re-tuned)
+
+29-09: median stock +0.39% from the 09:15 close at the last bar; afternoon fade.
+Regime A (absorbed selling) returned −0.04% (11:15) and −0.06% (12:45) vs the
+median stock, below baseline; regime C returned +0.28% at 11:15 (reverse of its
+history); regime E was the best (+0.55% / +0.64%, 78% / 67% win). Pooled over
+six decision times and 7 days: A +0.17% (6 of 7 days, was +0.24% over 6 of 6), B +0.07%, C +0.005% (3 of 7 days),
+C2 +0.12%, D −0.03% (2 of 7 days), D2 +0.06%, E +0.12% (7 of 7 days). The A advantage shrinks
+from about +0.19% to about +0.11% over baseline, and the C weakness is gone, so
+treat the playbook's "avoid C" advice as unproven. See `research/day_reports/29-09-2026_out_of_sample.md`.
