@@ -443,3 +443,44 @@ Eight groups were tested, so only the large ones are worth a second look. Notabl
 exceptionally large (SIZE) were followed by about +0.21% to the close (6 of 7 days), and high-volume buying
 outliers by −0.20%. These are consistent with large selling being followed by relief and with heavy buying
 being a poor sign, but they need more days before they are used.
+
+---
+
+## SIZE-driven selling outliers across all 7 days (`outlier_study.py`)
+
+Bars with at least 10% net selling delta whose delta size, price move and volume spike are a Mahalanobis joint outlier (d > 3.06)
+with the SIZE driver (exceptionally large selling delta). 320 bars in 236 stock-days, bars 09:45 to 14:15 so each has a return
+to the 14:45 close; compared with the median stock over the same bars. Baseline (all 14,487 selling bars with delta below −10%): mean +0.065%, median +0.012%, win 51%.
+
+| | n | Mean to close | Median | Win | Days + |
+|---|---|---|---|---|---|
+| **All SIZE-driven selling outliers** | 320 | **+0.21%** (t 3.9) | +0.10% | 54% | 6/7 |
+| Without the top 5% of outcomes | 304 | +0.07% | | | |
+| Trimmed mean (10% each end) | | +0.15% | | | |
+| One value per stock-day | 236 | +0.17% (t 2.6) | | | |
+
+By day: 15-09 +0.39% (68% win), 16-09 +0.46%, 17-09 +0.10%, **18-09 −0.16%**, 28-09 +0.03%, 29-09 +0.08%, 01-10 +0.31%.
+
+**What separates better from worse outliers** (mean return to the close):
+
+| Split | Better | Worse |
+|---|---|---|
+| Position in the day's range so far | **lower third +0.31%** (n 205, t 4.2, 6/7 days) | middle +0.04%, upper third −0.03% |
+| Structure vs the master candle | **inside master +0.31%** (n 146, t 4.3) | above −0.01%, below +0.05% |
+| Regime at that bar | **B +0.38%** (n 116, t 4.6, 6/7) | D +0.04%, C2 −0.03%, A +0.05% |
+| Time of the bar | 09:45–10:15 +0.47%, 10:45–11:15 +0.41%, 11:45–12:15 +0.23% | **12:45–13:15 −0.01%**, 13:45–14:15 +0.15% |
+| Delta size, price move in the bar, volume spike | no clear pattern (+0.17% to +0.33% in all bands) | |
+
+**Best combination (found after looking at the splits):** selling outlier, price in the lower third of the day's range AND still
+inside the master candle: **72 bars, +0.55% (median +0.49%, 74% win, t 5.3, 6 of 7 days)**; the same bars with only one of the two
+conditions are about +0.04%. By day: 15-09 +0.91% (21 bars, 100% win), 16-09 +0.96%, 17-09 +0.04%, 18-09 −0.29% (3 bars),
+28-09 +0.39%, 29-09 +1.08% (2 bars), 01-10 +0.32%; first four days +0.66% vs last three days +0.40%. Adding "before 12:45" to the lower-third
+condition gives +0.47% (112 bars, 6/7 days).
+
+**Concentration:** 47 stock-days have two or more outlier bars. Stocks flagged on three or more days (IIFLCAPS all 7 days, PREMEXPLN 6, RHIM 5, GALLANTT 5, CHOICEIN 5, BLISSGVS 4, RELIGARE 4, AGIIL 4,
+GREENLAM 4, LOTUSDEV 4, KANSAINER 4) account for 142 bars (+0.18%); the other 178 bars average +0.23%, so the effect is not just a few repeat names
+(within the repeaters: STLTECH +0.95%, GREENLAM −0.65%).
+
+**Caution:** about 25 splits were examined, so the best subgroup's t-statistic is inflated by selection, and the combination was chosen after
+looking at all 7 days (the early/late comparison is therefore only a sanity check, not an out-of-sample test). It is a hypothesis to confirm on
+new days, not a rule. Effects are measured against the median stock and exclude costs.
