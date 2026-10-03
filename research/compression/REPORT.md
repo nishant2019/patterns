@@ -211,3 +211,66 @@ resolve least often (36–45%) and show no direction.
 4. Ignore coil delta for direction. Use it only as context.
 5. When the break comes, check its delta: strong delta in the break direction
    (>= 15% of bar volume) is a warning of a failed break, not a confirmation.
+
+---
+
+# Part 4: CVD candles vs price candles (`cvd_candles.py`)
+
+A CVD candle is `(open_cvd, high_cvd, low_cvd, close_cvd)` per bar, the
+second chart in the TCS screenshot. Tests over 6 days (30,400 stock-bars);
+outcomes are the next 2 bars and the return to 14:45 vs the median stock.
+**Baseline for every bar is +0.03% (2 bars) and +0.055% (to close)** because the
+mean sits above the median; effects must be judged against that, not zero.
+
+## A. Bar-level relationship
+- Price candle colour agrees with CVD candle colour on **70%** of bars; the
+  correlation between bar return and delta % of volume is **0.42**; the
+  correlation between the price candle's range and the CVD candle's range
+  (as % of volume) is **0.00**.
+
+| Price candle / CVD candle | Bars | Next 2 bars | To close |
+|---|---|---|---|
+| up / up | 8,900 | +0.02% | +0.05% |
+| up / down (CVD divergence) | 4,544 | +0.04% | +0.06% |
+| down / up (CVD divergence) | 4,509 | +0.03% | +0.06% |
+| down / down | 12,447 | +0.04% | +0.06% |
+
+All four sit on the baseline: colour agreement or divergence between a price
+candle and its CVD candle carries no information about what follows.
+
+CVD candle wicks: a long CVD upper wick (CVD spiked up inside the bar, then
+faded; 1,976 bars) is followed by +0.09% to close (vs +0.055% baseline,
+t 3.8, 5/6 days), the only bar-level shape that stands out, but by about 0.04%
+over baseline. Lower wick >= 60% (2,234 bars): +0.06% to close, baseline.
+
+## B. Structure: does the CVD chart break out of the master before price does?
+Apply the master-candle test to the CVD candle chart: master CVD range =
+`[low_cvd, high_cvd]` of the first bar.
+
+| Event | Count | Signed return, next 2 bars | To close |
+|---|---|---|---|
+| Price breaks master range first | 2,191 | −0.02% | – |
+| CVD breaks its master range first | 2,872 | +0.00% | – |
+| CVD breaks out, price still inside master range (CVD leads) | 1,938 | −0.02% | −0.03% |
+| CVD breaks, price already broke the same way | 776 | +0.03% | +0.07% |
+| CVD breaks, price broke the opposite way (divergence) | 158 | +0.10% (t 1.8) | +0.15% (t 1.4) |
+| Price breaks, CVD still inside its range (price leads) | 548 | −0.05% (t −1.8) | −0.09% (t −1.7) |
+| Price breaks, CVD already broke the same way (confirmed) | 1,365 | −0.01% | +0.01% |
+
+CVD does not lead price: CVD breaks while price is still inside the master
+range produce nothing. Confirmation by CVD adds nothing to a price break. The
+only hint is divergence between the two breaks (n = 158, not significant).
+
+## Conclusion
+Building candles from cumulative delta gives a real, readable second chart
+(as in TCS 28-09, where it clearly shows the climax, the undercut and the
+reclaim), but across 30,000 bars the *relationship* between price candles and
+CVD candles (colour agreement, wicks, who breaks first) does not predict the
+next move. It is descriptive context for a discretionary trader, not a
+screening rule.
+
+## Data note
+The TCS CSV ends at the 14:45 bar, while the screenshot shows a large red CVD
+candle at the right edge. About one third of the stocks each day (e.g. 173 of
+507) have 12 bars instead of 13, so the last bar is missing for them; worth
+checking the export.
