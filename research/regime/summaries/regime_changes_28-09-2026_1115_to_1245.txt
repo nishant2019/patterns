@@ -1,0 +1,71 @@
+28-09-2026: regimes at 11:15 -> 12:45  (506 stocks)
+from \ to     A    B    C   C2    D   D2    E   total
+A             8   10    0    0    1    0    0      19
+B             2  193    2    7   30   35    9     278
+C             0    3   12    4    0    1    0      20
+C2            1    6    2    5    0    0    0      14
+D             1    5    0    1   65   13    0      85
+D2            0    6    0    0   14   42    1      63
+E             0    6    1    0    1   12    7      27
+
+174 stocks changed regime (34%); stayed 332
+
+Entered A (absorbed selling inside the range): 4
+  STLTECH       B -> A  inside, middle       close 815.3 (master 802.1-834) delta -52% price +0.47%  -> to close +2.06%
+  SHREEJISPG   C2 -> A  inside, middle       close 756.15 (master 751.9-759.7) delta -18% price +0.47%  -> to close +0.01%
+  MARICO        D -> A  inside, middle       close 811.45 (master 808.6-815) delta -18% price +0.01%  -> to close -0.72%
+  ASIANPAINT    B -> A  inside, middle       close 2426.6 (master 2416-2441.6) delta -15% price +0.26%  -> to close -0.35%
+
+Left A: 11
+  PRICOLLTD     A -> B  inside, lower third  close 754.5 (master 751.1-762.15) delta -40% price -0.21%  -> to close -0.44%
+  SAPPHIRE      A -> B  inside, lower third  close 218.17 (master 216.42-223) delta -36% price -0.20%  -> to close -0.58%
+  IGIL          A -> D  BELOW master low     close 322.75 (master 323.7-329.95) delta -30% price -1.09%  -> to close +0.08%
+  SANDUMA       A -> B  inside, lower third  close 183.46 (master 182.1-186.4) delta -26% price +0.52%  -> to close -1.13%
+  IEX           A -> B  inside, lower third  close 111.7 (master 111.41-112.88) delta -20% price +0.16%  -> to close -0.54%
+  AFCONS        A -> B  inside, lower third  close 251.35 (master 250.35-253.85) delta -20% price -0.02%  -> to close -0.56%
+  SAILIFE       A -> B  inside, lower third  close 1579 (master 1575.1-1611.1) delta -17% price -0.52%  -> to close +0.36%
+  LGEINDIA      A -> B  inside, upper third  close 1738.4 (master 1713.3-1740) delta -8% price +0.93%  -> to close -0.48%
+  J&KBANK       A -> B  inside, middle       close 144.56 (master 143.15-145.88) delta -7% price +0.70%  -> to close -1.63%
+  SARDAEN       A -> B  inside, upper third  close 492.35 (master 485.1-495.05) delta -6% price +0.92%  -> to close +2.00%
+  PTC           A -> B  inside, middle       close 155.18 (master 154.5-155.79) delta -2% price +0.39%  -> to close -0.23%
+
+New breakouts (to C or C2): 11
+  FDC           D -> C2 ABOVE master high    close 344.25 (master 340.35-343.05) delta -20% price +0.92%  -> to close -0.15%
+  AGIIL         B -> C2 ABOVE master high    close 271.4 (master 258.05-267.85) delta +0% price +4.99%  -> to close -0.07%
+  BELRISE       B -> C2 ABOVE master high    close 251.1 (master 244.24-249.95) delta +1% price +2.56%  -> to close -0.64%
+  WELSPUNLIV    B -> C2 ABOVE master high    close 226.55 (master 221.8-225.3) delta +4% price +1.27%  -> to close +1.04%
+  SUNTV         B -> C2 ABOVE master high    close 522.1 (master 506.1-521.8) delta +6% price +0.17%  -> to close -0.51%
+  VOLTAS        B -> C2 ABOVE master high    close 1137.4 (master 1122.9-1135.6) delta +7% price +1.22%  -> to close -0.65%
+  KAYNES        B -> C2 ABOVE master high    close 3646.9 (master 3591.4-3629.3) delta +7% price +1.08%  -> to close +0.41%
+  LAURUSLABS    B -> C2 ABOVE master high    close 2010 (master 1984.8-2009) delta +7% price +0.54%  -> to close -0.00%
+  ANANTRAJ      B -> C  ABOVE master high    close 616 (master 604-615.7) delta +15% price +1.86%  -> to close -1.19%
+  DRREDDY       B -> C  ABOVE master high    close 1228.7 (master 1204-1219.9) delta +26% price +1.34%  -> to close -0.63%
+  ICICIGI       E -> C  ABOVE master high    close 1550.8 (master 1530.4-1548.9) delta +31% price +1.13%  -> to close -0.53%
+
+New breakdowns (to D): 46
+  GODREJIND     B -> D  BELOW master low     close 1082.1 (master 1091.4-1107.6) delta -83% price -2.25%  -> to close -0.12%
+  KNRCON        B -> D  BELOW master low     close 118.1 (master 118.3-120.09) delta -48% price -0.41%  -> to close -0.51%
+  NORTHARC      B -> D  BELOW master low     close 290.8 (master 293.3-300) delta -42% price -2.28%  -> to close -0.14%
+  NEWGEN        B -> D  BELOW master low     close 476.85 (master 478.7-488.9) delta -42% price -0.59%  -> to close -0.53%
+  SASKEN        B -> D  BELOW master low     close 1665 (master 1670.7-1711.1) delta -36% price -0.67%  -> to close -0.30%
+  IIFLCAPS      B -> D  BELOW master low     close 344.25 (master 345.35-347.05) delta -33% price -0.42%  -> to close -0.07%
+  GPIL          E -> D  BELOW master low     close 223.88 (master 225.75-228.36) delta -31% price -0.94%  -> to close +0.80%
+  IGIL          A -> D  BELOW master low     close 322.75 (master 323.7-329.95) delta -30% price -1.09%  -> to close +0.08%
+  KANSAINER    D2 -> D  BELOW master low     close 178.83 (master 179.39-183.26) delta -27% price -0.38%  -> to close -0.79%
+  THYROCARE     B -> D  BELOW master low     close 554.85 (master 555.1-564.15) delta -25% price -1.04%  -> to close -1.14%
+  ATGL         D2 -> D  BELOW master low     close 597.7 (master 601-611.5) delta -25% price -0.60%  -> to close -0.47%
+  TENNIND       B -> D  BELOW master low     close 503.55 (master 505.4-513.45) delta -24% price -0.63%  -> to close -0.36%
+
+Reclaimed the master range (from D/D2 to inside): 13
+  METROPOLIS    D -> B  inside, lower third  close 570.95 (master 570.25-582.6) delta -20% price -0.32%  -> to close +0.28%
+  THERMAX      D2 -> B  inside, lower third  close 3381.2 (master 3381.2-3464.2) delta -19% price -0.29%  -> to close +0.31%
+  MARICO        D -> A  inside, middle       close 811.45 (master 808.6-815) delta -18% price +0.01%  -> to close -0.72%
+  PNCINFRA      D -> B  inside, lower third  close 133.62 (master 133.12-138.4) delta -11% price +0.27%  -> to close -2.39%
+  BALUFORGE     D -> B  inside, lower third  close 495 (master 494.5-507.05) delta -10% price -0.35%  -> to close +0.08%
+  GSFC         D2 -> B  inside, lower third  close 153.6 (master 153.5-156.85) delta -9% price -0.13%  -> to close -0.29%
+  PATANJALI     D -> B  inside, lower third  close 396.1 (master 396.05-403.05) delta -6% price -0.43%  -> to close -1.55%
+  KERNEX       D2 -> B  inside, lower third  close 1687.4 (master 1680.9-1747) delta -1% price +0.09%  -> to close +1.33%
+  VIYASH       D2 -> B  inside, lower third  close 241.1 (master 239.75-244.35) delta +12% price +0.17%  -> to close +0.04%
+  APLAPOLLO    D2 -> E  inside, lower third  close 2189.1 (master 2188.3-2210.2) delta +16% price +0.04%  -> to close -0.32%
+  GMRP&UI       D -> B  inside, middle       close 100.74 (master 99.88-102.19) delta +23% price +0.67%  -> to close +0.75%
+  HCLTECH      D2 -> B  inside, middle       close 1254.1 (master 1248-1263) delta +24% price +0.18%  -> to close +0.07%

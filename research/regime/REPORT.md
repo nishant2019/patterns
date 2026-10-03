@@ -109,3 +109,59 @@ regimes describe the broad state, not these specific setups.
   undercut for the discretionary trader.
 - Down days dominate the sample (2 selloffs, 2 mild down days, 1 rally, 1 flat),
   so confirm on more days before relying on the C and D results.
+
+---
+
+## Regime changes (`regime_changes.py`) and the 28-09-2026 run
+
+```bash
+python research/regime/regime_changes.py 28-09-2026 --outcomes      # transition matrix + who moved
+python research/regime/regime_changes.py --all-days                 # pooled transition statistics
+```
+Outputs: `summaries/regime_changes_28-09-2026_1115_to_1245.txt` and
+`summaries/regime_changes_all_days_1115_to_1245.txt`.
+
+### 28-09-2026: how the regimes did (return to 14:45 vs the median stock)
+A mild down day: the median stock lost 0.50% from 11:15 and 0.22% from 12:45;
+only 18% to 30% of first breaks of the master range went up.
+
+| Regime | At 11:15: n | Raw | vs median | At 12:45: n | Raw | vs median |
+|---|---|---|---|---|---|---|
+| A absorbed selling | 19 | −0.40% | +0.10% | 12 | −0.15% | +0.07% |
+| B balanced | 278 | −0.44% | +0.06% | 229 | −0.15% | +0.06% |
+| C extended breakout, buying confirmed | 20 | −0.50% | −0.00% | 17 | −0.40% | **−0.19%** |
+| C2 breakout holding | 14 | +0.11% | **+0.61%** | 17 | +0.08% | **+0.30%** |
+| D breakdown, selling confirmed | 85 | −0.53% | −0.03% | 111 | −0.21% | +0.01% |
+| D2 below master low, not confirming | 63 | −0.49% | +0.01% | 103 | −0.16% | +0.06% |
+| E buying absorbed | 27 | −0.40% | +0.10% | 17 | −0.31% | −0.10% |
+
+Against the +0.05% baseline, regime A added only about +0.05% on this day,
+well below its +0.19% average, and C again lagged at 12:45 (−0.19%, 35% win).
+The strongest result was C2 (breakouts that held), small samples.
+
+### Who changed regime between 11:15 and 12:45 (506 stocks)
+174 stocks (34%) changed regime; most stayed in B (193). Notable flows: 30 B
+to D and 35 B to D2 (breakdowns on a down day), 13 D/D2 reclaimed the range, 11
+new breakouts (8 to C2, 3 to C). Only 4 stocks entered A (STLTECH +2.06% to the
+close, SHREEJISPG +0.01%, MARICO −0.72%, ASIANPAINT −0.35%) and 11 left A (10 went
+to B, 1 to D); the leavers fell back to the lower third of the master range and
+were roughly flat against the market on average.
+
+### Pooled over six days (11:15 → 12:45, return from 12:45 to 14:45 vs median)
+| Transition | n | Return | Days + |
+|---|---|---|---|
+| **Entered A at 12:45** (was not A at 11:15) | 49 | **+0.47%** (t 2.6) | **6/6** |
+| A → B | 49 | +0.28% (t 2.0) | 5/6 |
+| A → A | 45 | +0.13% | 5/6 |
+| A at 11:15, any later state | 142 | +0.19% | 5/6 |
+| D → D | 353 | **−0.10%** (t −2.4) | 1/6 |
+| B → C | 74 | −0.12% | 3/6 |
+| C2 → C2 | 153 | +0.14% | 5/6 |
+
+- Entering regime A later in the day was the best transition (+0.47% over 49
+  stock-days, positive on every day) but small and overlapping with the A
+  results above.
+- Staying below the master low (D → D) was the weakest (−0.10%, positive on
+  only 1 of 6 days).
+- Stocks that were in A and fell back to B still beat the median (+0.28%), so
+  leaving A is not by itself a reason to drop the idea.
