@@ -151,6 +151,26 @@ CASTROLIND, GRASIM, INDUSINDBK.
   added nothing there. Possibly a defensive pattern: it holds up in selloffs
   but doesn't lead rallies. Too few days to tell.
 
+## Two-sided trade backtest (`two_sided.py`)
+
+After the signal, trade whichever side of the window closes outside first:
+long above the window high (stop at window low), short below the window low
+(stop at window high). Exit at the stop or the last bar's close. No costs.
+
+| Setup | Stop | Trades | Win | Avg / trade | Avg R |
+|---|---|---|---|---|---|
+| OAB | Opposite side | 17 (6 long, 11 short) | 35% | −0.15% | −0.07 |
+| OAB | Range mid | 17 | 35% | −0.04% | +0.10 |
+| Baseline | Opposite side | 165 (26 long, 139 short) | 48% | +0.08% | +0.08 |
+| Baseline | Range mid | 165 | 48% | +0.11% | +0.19 |
+
+Per day (baseline, opposite stop): 01-10 −0.04%/trade, 15-09 +0.55%
+(shorts on a selloff), 16-09 −0.07%. The positive baseline total comes
+entirely from shorting on the 15-09 selloff, i.e. market direction, not the
+pattern. **No edge as a two-sided range trade so far.** OAB longs won 1 of 6;
+many OAB stocks broke the window low first (shaking out shorts) before
+breaking out later in the day.
+
 ## Known limitations
 
 - **One trading day.** All thresholds were tuned on 01-10-2026. Treat them as
