@@ -28,3 +28,10 @@ Thirteen-bar stocks 333, twelve-bar stocks 173.
 small and consistent over 6 days look smaller and less consistent over 7. Treat the 6-day numbers as optimistic.
 
 Files: `scanners/oab/results/oab_29-09-2026.csv`, `scanners/coil_fade/results/signals_29-09-2026.csv`, `research/absorption/absorption_events_29-09-2026.csv`.
+
+## SIZE-driven selling outliers (Mahalanobis, `research/absorption/outlier_scanner.py`)
+`python research/absorption/outlier_scanner.py 29-09-2026` lists bars with |delta| >= 10% of volume whose delta size, price move and
+volume spike are a joint outlier (d > 3.06) with the SIZE driver on the selling side: **28 bars in 24 stocks** (list in
+`research/absorption/outliers_size_selling_29-09-2026.csv`). Biggest by distance: CHAMBLFERT 11:15 (−254K, −95% of volume, 7.8× spike, price flat),
+CHOICEIN 12:45, RELIGARE 13:45, AWL 10:15 (−932K), FINCABLES, BLISSGVS, KRBL. Against the median stock, the 23 with later bars returned
++0.19% over 2 bars and +0.21% to the close, but only 39% won; a few large winners (KANSAINER +3.5%, BLISSGVS +1.8%, AWL +1.6%, KRBL +1.2%) drive the mean.
