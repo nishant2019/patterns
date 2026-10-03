@@ -1,14 +1,15 @@
 """Candle chart with delta-efficiency labels (self-contained HTML + inline SVG).
 
 Panels: price candles (master range shaded) / CVD candles / per-bar delta / efficiency labels.
-Efficiency = how much price moved for the delta, ranked against peers with a similar |delta| (|D| decile, pooled over
-all stocks and days), so the labels are balanced by construction:
-  STRONG   price moved more than 67% of peers with the same delta        (efficient delta)
-  NORM     33-67th percentile
-  ABSORBED <= 33rd percentile: price moved little for that much delta   (delta absorbed)
-  AGAINST  price moved opposite to the delta
-  -        |net delta| < 10% of volume: not classified
-D = net delta % of volume, P = price move in master-bar ranges.
+Efficiency = how far the price move for the delta deviates from what is typical for bars with a similar |delta|,
+measured with a robust z-score (median and MAD of peers, pooled over all stocks and days):
+  z = -(Pd - median) / (1.4826 x MAD),  Pd = price move in master ranges, signed along the delta.
+  Positive z = price moved less than usual (delta absorbed); negative z = price moved more than usual (efficient).
+  z >= +2   ABSORBED  (AGAINST when price actually moved opposite to the delta)
+  -2 < z < 2  NORM
+  z <= -2   STRONG
+  -         |net delta| < 10% of volume: not classified
+D = net delta % of volume.
 Rows:  Bar = this candle alone | Roll 4 = last 4 bars | Since 09:45 = day so far after the opening bar | CVD swing.
 CVD swing marker (diamond above the price candle and a chip in the last row): swing = (high_cvd - low_cvd) as % of
 the stock-day's average bar volume, ranked vs all bars.  TWO-WAY = top-20% swing whose net delta is <= 30% of the swing (heavy flow in
@@ -36,7 +37,8 @@ def window(d, a, t):
 
 
 def peer_tables():
-    """For each window kind, sorted |P| of all peers grouped by |D| decile (peers = windows with |D| >= DMIN)."""
+    """For each window kind: |D| decile edges and, per decile, (median, 1.4826 x MAD) of Pd = the price move in master ranges signed
+    ALONG the delta (positive = price followed the delta, negative = moved against it). Peers = windows with |D| >= DMIN."""
     pts = {k: [] for k in ("bar", "roll", "day")}
     swings = []
     for folder in sorted(glob.glob(os.path.join(HERE, "..", "..", "data", "CVD_Scanner_*"))):
@@ -55,14 +57,35 @@ def peer_tables():
                     pts["day"].append(window(d, 1, t)[:2])
     tables = {}
     for k, v in pts.items():
-        v = [(abs(D), abs(P)) for D, P in v if abs(D) >= DMIN]
-        v.sort()
+        v = sorted((abs(D), (1 if D > 0 else -1) * P) for D, P in v if abs(D) >= DMIN)
         edges = [v[len(v) * q // 10][0] for q in range(1, 10)]
         groups = [[] for _ in range(10)]
-        for ad, ap in v: groups[bisect.bisect(edges, ad)].append(ap)
-        tables[k] = (edges, [sorted(g) for g in groups])
+        for ad, pd_ in v: groups[bisect.bisect(edges, ad)].append(pd_)
+        stats = []
+        for g in groups:
+            m = st.median(g); mad = st.median(abs(x - m) for x in g) or 1e-9
+            stats.append((m, 1.4826 * mad))
+        tables[k] = (edges, stats)
     tables["swing"] = sorted(swings)
     return tables
+
+
+ZMIN = 2.0
+
+
+def state(D, P, table):
+    """Robust conditional z-score of the price move for this delta, vs bars with a similar |delta|:
+         z = -(Pd - median) / (1.4826 x MAD)         (positive z = price moved LESS than usual for the delta = absorbed)
+    |z| < 2 NORM; z >= 2 ABSORBED (AGAINST if price actually moved opposite to the delta); z <= -2 STRONG (efficient).
+    Returns (label, z)."""
+    if abs(D) < DMIN: return "-", None
+    edges, stats = table
+    med, scale = stats[bisect.bisect(edges, abs(D))]
+    pd_ = (1 if D > 0 else -1) * P
+    z = -(pd_ - med) / scale
+    if z >= ZMIN: return ("AGAINST" if pd_ < 0 else "ABSORBED"), z
+    if z <= -ZMIN: return "STRONG", z
+    return "NORM", z
 
 
 def swing_state(b, table, avgv):
@@ -73,17 +96,6 @@ def swing_state(b, table, avgv):
     ratio = abs(b["cc"] - b["co"]) / rng if rng > 0 else 1.0
     lab = "-" if pct < 80 else ("TWO-WAY" if ratio <= 0.30 else "SWING")
     return lab, rng / avgv * 100, pct, ratio
-
-
-def state(D, P, table):
-    """Label a window against peers of similar |delta|: AGAINST if price moved opposite to delta; otherwise by the
-    percentile of |price move| among peers: <= 33 ABSORBED, 33-67 NORM, >= 67 STRONG. Returns (label, percentile)."""
-    if abs(D) < DMIN: return "-", None
-    if D * P < 0: return "AGAINST", None
-    edges, groups = table
-    g = groups[bisect.bisect(edges, abs(D))]
-    pct = 100 * bisect.bisect(g, abs(P)) / len(g)
-    return ("ABSORBED" if pct <= 33 else "NORM" if pct < 67 else "STRONG"), pct
 
 
 def build(sym, date, tables):
@@ -122,7 +134,7 @@ def render(sym, date, bars):
     dy = lambda v: (D0 + D1) / 2 - v / dm * (D1 - D0) / 2
     s = []
     s.append(f'<text x="{left}" y="28" class="title">{sym}  {date.replace("-", " ")}</text>')
-    s.append(f'<text x="{left}" y="46" class="sub">Price candles · CVD candles · bar delta · delta efficiency labels (price move per unit of delta vs peers; p = percentile)</text>')
+    s.append(f'<text x="{left}" y="46" class="sub">Price candles · CVD candles · bar delta · delta efficiency (robust z-score vs bars with similar delta; z>0 = absorbed)</text>')
     # master band
     s.append(f'<rect x="{left}" y="{py(mH):.1f}" width="{W-left-right}" height="{py(mL)-py(mH):.1f}" class="band"/>')
     s.append(f'<line x1="{left}" x2="{W-right}" y1="{py(mH):.1f}" y2="{py(mH):.1f}" class="mline"/><line x1="{left}" x2="{W-right}" y1="{py(mL):.1f}" y2="{py(mL):.1f}" class="mline"/>')
@@ -135,7 +147,7 @@ def render(sym, date, bars):
     for b in bars:
         x = X(b["i"]); up = b["c"] >= b["o"]; cls = "up" if up else "dn"
         tip = (f'{b["t"]}  O {b["o"]:g} H {b["h"]:g} L {b["l"]:g} C {b["c"]:g}  ret {b["ret"]:+.2f}%  delta {b["delta"]/1000:+.1f}K ({b["D"]:+.0f}% of vol)  '
-               f'bar efficiency {b["bar"][0]}{"" if b["bar"][1] is None else " (p%d)" % round(b["bar"][1])}')
+               f'bar efficiency {b["bar"][0]}{"" if b["bar"][1] is None else " (z %+.1f)" % b["bar"][1]}')
         swl, swp, swpc, swr = b["sw"]
         tip += f'  |  CVD swing {swp:.0f}% of avg bar volume (p{swpc:.0f}); CVD fell {(b["co"]-b["cl"])/1000:.1f}K below open, rose {(b["ch"]-b["co"])/1000:.1f}K above; net {b["delta"]/1000:+.1f}K ({swr*100:.0f}% of swing) [{swl}]'
         mark = ""
@@ -171,9 +183,9 @@ def render(sym, date, bars):
             if st_ in ("", ):
                 continue
             fill = "var(--master)" if st_ == "MASTER" else dict(STATES)[st_]
-            s.append(f'<g><title>{b["t"]} {lab}: {st_}{"" if de is None else f" (percentile {de:.0f} among peers with similar delta)"}</title><rect x="{x-step*.46:.1f}" y="{y}" width="{step*.92:.1f}" height="38" rx="4" style="fill:{fill}"/>'
+            s.append(f'<g><title>{b["t"]} {lab}: {st_}{"" if de is None else f" (robust z {de:+.1f}: positive = price moved less than usual for this delta)"}</title><rect x="{x-step*.46:.1f}" y="{y}" width="{step*.92:.1f}" height="38" rx="4" style="fill:{fill}"/>'
                      f'<text x="{x:.1f}" y="{y+16}" class="chip{" n" if st_ == "-" else ""}" text-anchor="middle">{st_}</text>'
-                     f'<text x="{x:.1f}" y="{y+31}" class="chip2{" n" if st_ == "-" else ""}" text-anchor="middle">{"" if de is None else "p%d" % round(de)}</text></g>')
+                     f'<text x="{x:.1f}" y="{y+31}" class="chip2{" n" if st_ == "-" else ""}" text-anchor="middle">{"" if de is None else "z%+.1f" % de}</text></g>')
     y = E0 + 150
     s.append(f'<text x="{left-8}" y="{y+22}" class="pan" text-anchor="end">CVD swing</text>')
     for b in bars:
@@ -186,14 +198,14 @@ def render(sym, date, bars):
         s.append(f'<text x="{X(b["i"]):.1f}" y="{E0+206}" class="ax" text-anchor="middle">{b["t"]}</text>')
     # legend
     lx = left; ly = E0 + 232
-    for name, var, desc in (("STRONG", "var(--over)", "top third of peers"), ("NORM", "var(--norm)", "middle third"), ("ABSORBED", "var(--ineff)", "bottom third"),
-                            ("AGAINST", "var(--against)", "price opposed delta"), ("-", "var(--none)", "|delta| < 10%")):
+    for name, var, desc in (("STRONG", "var(--over)", "z <= -2 efficient"), ("NORM", "var(--norm)", "|z| < 2"), ("ABSORBED", "var(--ineff)", "z >= +2"),
+                            ("AGAINST", "var(--against)", "z >= +2, price opposed"), ("-", "var(--none)", "|delta| < 10%")):
         s.append(f'<rect x="{lx}" y="{ly-10}" width="14" height="14" rx="3" style="fill:{var}"/><text x="{lx+20}" y="{ly+2}" class="lg">{name}: {desc}</text>')
-        lx += 190
+        lx += 215
     ly += 22; lx = left
     s.append(f'<polygon points="{lx+6},{ly-10} {lx+12},{ly-4} {lx+6},{ly+2} {lx},{ly-4}" class="mk two"/><text x="{lx+20}" y="{ly+2}" class="lg">TWO-WAY swing: heavy CVD swing that netted out (marker above the candle)</text>')
     s.append(f'<polygon points="{lx+526},{ly-10} {lx+532},{ly-4} {lx+526},{ly+2} {lx+520},{ly-4}" class="mk one"/><text x="{lx+540}" y="{ly+2}" class="lg">one-sided large swing</text>')
-    s.append(f'<text x="{left}" y="{ly+28}" class="sub">Efficiency = price move for the delta, ranked vs peers with similar |delta| (p = percentile). ABSORBED = delta did little; STRONG = delta moved price a lot.</text>')
+    s.append(f'<text x="{left}" y="{ly+28}" class="sub">Efficiency = robust z-score of the price move vs bars with similar |delta|. +z = moved less than usual (absorbed); -z = moved more; |z| >= 2 flagged.</text>')
     s.append(f'<text x="{left}" y="{ly+46}" class="sub">CVD swing = (high CVD - low CVD) as % of the stock-day average bar volume, ranked vs all bars; TWO-WAY = top-20% swing that netted to 30% of itself or less.</text>')
     H_ = E0 + 345
     css = """

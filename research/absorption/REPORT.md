@@ -339,3 +339,69 @@ Examples (28-09): `charts/TCS_…`, `AUROPHARMA_…`, `DABUR_…`, `IREDA_…`
 7.2x the master's volume and finished −146K; the stock then ran out of buyers
 and CVD fell from +654K to −109K by 14:45 while price stayed above the master
 range).
+
+---
+
+## Replacing percentiles with outlier statistics (`efficiency_metrics.py`)
+
+**Why change:** a percentile is a rank. It flags a fixed third of bars as "absorbed" by
+construction and saturates (p99 and p99.9 look alike), so it cannot say how *unusual*
+a bar is. Outlier statistics measure the deviation in standard units, so only real
+outliers are flagged and the size of the deviation is visible.
+
+### Metrics researched and implemented
+Common inputs: `D` = net delta % of volume; `Pd` = price move (in master-bar ranges)
+signed along the delta (negative = price moved against it); peers = bars in the same
+|D| decile, pooled over all stocks and days. Positive score = delta did less than usual.
+
+| Metric | Calculation | Source / idea |
+|---|---|---|
+| Percentile (old) | rank of Pd among peers | – |
+| Classical conditional z | (Pd − mean) / std of peers | standard z-score |
+| **Robust z (MAD)** | **(Pd − median) / (1.4826 × MAD)** of peers; \|z\| ≥ 3.5 outlier, ≥ 3 soft | modified z-score ([robust statistics](https://www.researchgate.net/publication/256752600_Detecting_outliers_Do_not_use_standard_deviation_around_the_mean_use_absolute_deviation_around_the_median), [MAD-scaled z](https://metricgate.com/docs/mad-scaled-z-score/)) |
+| Kyle-lambda residual | OLS Pd = λ·\|D\| + c; residual / residual std in the peer decile | Kyle's price-impact regression ([overview](https://onepagecode.substack.com/p/quant-trading-kyles-price-impact)) |
+| Amihud-style impact | Pd ÷ (\|delta\| / day-average bar volume), then robust z vs peers of similar size | Amihud illiquidity, \|return\| per unit of volume (correlation with Kyle's λ about 0.82 in the literature, [study](https://arxiv.org/abs/2607.01377)) |
+| Mahalanobis distance | √((x−μ)ᵀS⁻¹(x−μ)) on (\|D\|, Pd, ln volume spike); outlier if d² > χ²(3, 97.5%) = 9.35 | multivariate outliers ([robust variant](https://www.sciencedirect.com/science/article/abs/pii/S0022103117302123)) |
+| CUSUM | S_t = max(0, S_{t−1} + z_t − k), k = 0.5, alarm at S ≥ 4, per stock-day | sequential change detection on residuals ([control charts](https://www.net.in.tum.de/fileadmin/TUM/members/muenz/documents/muenz08control-charts.pdf)) |
+
+Reviewed but not used: **VPIN** (mean absolute buy-sell imbalance over equal-volume buckets, an
+order-flow toxicity measure rather than an efficiency measure, [description](https://metricgate.com/docs/vpin-order-flow-toxicity/));
+**Isolation Forest** (needs scikit-learn, which is not installed; it also tends to find only the
+"loudest" outliers, [comparison](https://arxiv.org/pdf/2006.08238)); **EWMA** (like CUSUM, for small persistent shifts).
+
+### Results (25,907 bars with |delta| ≥ 10% of volume, 7 days)
+1. **The ranking is almost identical across the conditional metrics.** Spearman agreement
+   between percentile, classical z, robust z and Kyle residual is 0.99–1.00; Amihud 0.96;
+   Mahalanobis 0.84; CUSUM 0.72. They differ in scale and tail behaviour, not in which bars
+   they rank as absorbed.
+2. **The classical z-score masks outliers; the robust z-score finds them.** Beyond |z| ≥ 3.5 the
+   classical z flags 0.9% of bars (its standard deviation is inflated by the outliers themselves);
+   robust z flags 3.4% (normal expectation 0.05%). Robust z reaches +21 absorbed and −44
+   efficient, so outliers are far heavier-tailed than a normal model suggests.
+   Beyond |z| ≥ 2: classical 4.7%, robust 11.6%, Amihud 11.5%.
+3. **Forward information is nil for every metric.** Spearman IC with the next 2 bars and with
+   the return to the close is between −0.015 and +0.025 for all metrics; the top decile ("most
+   absorbed") minus bottom decile ("most efficient") spread is −0.09% to +0.05% and positive
+   on only 1–6 of 7 days.
+   Robust-z bands, selling bars (return to close vs the median stock; baseline +0.065%):
+   z ≥ +3.5 (110 bars) +0.01%; +2 to +3.5 (329) −0.06%; |z| < 2 (13,042) +0.07%; z ≤ −3.5 (275) +0.04%.
+   Buying bars: z ≥ +3.5 (63) −0.03%; +2 to +3.5 (298) +0.04%; z ≤ −3.5 (426) +0.06%.
+   CUSUM alarms (first bar with S ≥ 4): selling bars (95) −0.14%, buying bars (58) +0.13%, both not significant.
+   So efficiency on its own does not reproduce the earlier selling-absorption (SA) result,
+   which also needed a volume spike of 1.5–3×.
+
+### Recommendation and chart change
+Use the **robust conditional z-score (median/MAD)**: simplest to compute, handles the heavy tails
+that classical z hides, gives a magnitude (z −3.4 vs −1.4 where a percentile would say p97 vs p91),
+and flags only genuine deviations. The chart now shows
+`z = −(Pd − median) / (1.4826 × MAD)` per bar, rolling-4 window and since-09:45 window:
+z ≥ +2 ABSORBED (AGAINST if price actually moved opposite to the delta; almost every z ≥ +2 bar is
+an AGAINST bar because the typical move is small relative to the spread), −2 < z < 2 NORM, z ≤ −2 STRONG.
+Compared with the percentile version it labels about 12% of bars instead of two-thirds, and a move
+of slightly the wrong sign (noise) is no longer called AGAINST. The Mahalanobis distance (adds the volume
+spike) and CUSUM (persistence) are available in `efficiency_metrics.py` if a joint or sequential flag is wanted.
+Like the percentile labels, none of these is a forecast; they describe how unusual the flow was.
+
+Label test with the new chart labels (`efficiency_label_test.py`; return to the close vs the median
+stock, baseline +0.06%): bar-level AGAINST after selling −0.04% (t −0.8), STRONG after selling +0.03%; rolling
+and day-level AGAINST after buying +0.15% and +0.17% (t +2.0, 6/7 and 4/7 days), the same small divergence signal as before.
