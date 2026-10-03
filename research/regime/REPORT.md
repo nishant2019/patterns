@@ -12,6 +12,21 @@ python research/regime/regime_scanner.py data/CVD_Scanner_28-09-2026 --time 11:1
 python research/regime/regime_scanner.py data/CVD_Scanner_28-09-2026 --time 11:15 --card TCS  # plan card
 ```
 
+## One-page summary
+```bash
+python research/regime/regime_summary.py 28-09-2026 --time 11:15 --png summary.png   # morning
+python research/regime/regime_summary.py 28-09-2026 --time 12:45                     # midday
+```
+Writes `summaries/regime_summary_<date>_<time>.html` (single file, light/dark):
+header chips (counts per regime, share above/below the master range), then one
+card per regime A–E with its historical statistics, bias, plan and
+invalidation, and a table of the stocks (top 10 by a regime-specific ranking,
+the rest in a collapsible list) with close, master range, position,
+delta/price since 09:45, volume trend, the level to watch, the invalidation
+level and flags (undercut low, coil bars, rising volume). `--outcomes` adds the
+realised move to the close for review on past days. Examples:
+`summaries/regime_summary_28-09-2026_1115.html` and `_1245.html` (with PNG previews).
+
 ## Inputs
 - **Structure**: where the latest close sits against the master (first) candle:
   ABOVE its high, BELOW its low, or inside (lower / middle / upper third).
