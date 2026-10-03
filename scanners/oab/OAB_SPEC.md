@@ -129,6 +129,28 @@ Parameters were **not** changed after seeing this day.
 - Combined (2 days): 13 setups, 7 breakouts (54%); split-half out-of-sample
   31% vs 14% baseline. The combined number is inflated by the tuning day.
 
+## Out-of-sample day: 16-09-2026 (507 stocks, up day)
+
+Parameters unchanged. Market: median stock +1.41% from the 09:15 close, 89%
+of stocks up.
+
+Setups: APOLLOTYRE (breakout 14:45), IGL (14:45), SJVN (15:15), BANKBARODA,
+CASTROLIND, GRASIM, INDUSINDBK.
+
+### All days, OAB vs baseline (return vs market median over the same bars)
+
+| Day | Type | OAB setups → breakouts | Baseline setups → breakouts | OAB vs market | Baseline vs market | OAB beat market |
+|---|---|---|---|---|---|---|
+| 01-10-2026 | Tuning, down | 8 → 6 (75%) | 86 → 13 (15%) | +0.69% | −0.04% | 6/8 |
+| 15-09-2026 | Unseen, selloff | 5 → 1 (20%) | 37 → 5 (14%) | +0.70% | +0.32% | 4/5 |
+| 16-09-2026 | Unseen, rally | 7 → 3 (43%) | 95 → 16 (17%) | −0.24% | −0.30% | 2/7 |
+
+- Breakout rate beat baseline on both unseen days (20% vs 14%, 43% vs 17%).
+- Return vs market: ahead on the down days, behind on the up day. On 16-09,
+  OAB lagged the market by about as much as the baseline, so the filters
+  added nothing there. Possibly a defensive pattern: it holds up in selloffs
+  but doesn't lead rallies. Too few days to tell.
+
 ## Known limitations
 
 - **One trading day.** All thresholds were tuned on 01-10-2026. Treat them as
