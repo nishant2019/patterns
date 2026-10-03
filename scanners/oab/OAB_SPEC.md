@@ -165,6 +165,34 @@ CASTROLIND, GRASIM, INDUSINDBK.
 Excluding the tuning day: 59 setups, breakout rate above baseline on all four
 days, and OAB beat the market on 2 of 4 days (strongly on 17-09).
 
+## Update: 28-09-2026 added (6 days)
+
+28-09: mild down day (median stock −0.37%). 11 setups, 3 breakouts (27%),
+−0.26% window end → close (absolute), +0.11% vs market. Parameters unchanged.
+
+| | 5 days | 6 days |
+|---|---|---|
+| OAB setups | 67 | 78 |
+| OAB breakout rate | 60% | 55% (baseline 32%) |
+| OAB vs market (window end → close) | +0.21% | +0.19% (beat market 59%, 5/6 days) |
+| Long-only, hold to close | +0.16% / trade, 58% win | **+0.07%**, 53% win |
+| Long-only, 2R target | +0.22% / trade | +0.15% / trade |
+| Stop (master low) hit | 18 of 67 | 25 of 78 |
+
+28-09 long-only trades: 11 trades, average −0.47%, 18% win. The edge versus
+the market holds up (+0.11%), but the absolute long-only return is thin
+(+0.07%/trade before costs) and is not distinguishable from zero.
+
+The market-regime idea (skip when the market is down > 0.5%) is **not
+supported by the new day**: on 28-09 the market was only about −0.2% to 0%
+at the window ends, so the filter would not have skipped it, yet the
+trades lost. The 6-day split is unchanged (6 setups below −0.5%: −0.52%;
+72 above: +0.22%) because 28-09 contributed no setups below −0.5%.
+
+Net: OAB still shows a relative edge over the average stock and a higher
+breakout rate than the baseline, but as a standalone long-only trade it is
+roughly breakeven before costs.
+
 ## Two-sided trade backtest (`two_sided.py`)
 
 After the signal, trade whichever side of the window closes outside first:

@@ -103,6 +103,31 @@ makes it overlap (49 of 67) but then it adds nothing (+0.23% vs +0.15%,
 breakout rate unchanged). They are two separate signals, best used
 independently.
 
+## Update: 28-09-2026 added (6 days, ~3,040 stock-days, 30,400 bars)
+
+28-09 was a mildly down day (median stock −0.37%, 34% up). Nothing was
+re-tuned.
+
+| Pattern | 5 days | 6 days | 28-09 alone |
+|---|---|---|---|
+| Selling absorption (SA), next 2 bars | +0.15% (t 3.8), 5/5 days | **+0.13% (t 3.7), 6/6 days** | +0.00% (n=66) |
+| SA, to close | +0.16% | +0.12% | −0.04% |
+| SAB refined, next 2 bars | +0.25% (t 4.4), 4/5 | **+0.20% (t 4.3), 4/6** | −0.01% (n=42) |
+| SAB refined, to close | +0.19%, 5/5 | **+0.15% (t 2.7), 5/6** | −0.01% |
+| Buying exhaustion (BEX), to close | −0.39% (t −3.5), 4/5 | **−0.32% (t −2.9)**, negative 4/6 | **+0.26%** (n=11) |
+| Buying climax, to close | −0.18% | −0.15% (t −2.0) | +0.06% |
+| Buying absorption, to close | −0.04% | −0.05% | −0.12% |
+
+- **SA/SAB is still positive over 6 days but 28-09 was the first day with no
+  effect.** The edge shrank (+0.25% → +0.20% over two bars). It is a
+  small, noisy average edge, not a reliable per-day one.
+- **BEX weakened**: it reversed on 28-09 (+0.26% to close) and is now
+  negative on 4 of 6 days instead of 4 of 5. Still negative overall, but
+  less convincing.
+- **SAB as an OAB filter**: still not useful. Only 2 of 78 OAB setups
+  contain an SAB bar; an SAB bar *after* the window preceded poor results
+  (6 setups, 17% breakout, −0.32% vs market) but that is too few to act on.
+
 ## Caveats
 
 - **Five days.** Results are consistent across days but the sample is still
