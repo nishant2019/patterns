@@ -11,6 +11,9 @@ measured with a robust z-score (median and MAD of peers, pooled over all stocks 
   -         |net delta| < 10% of volume: not classified
 D = net delta % of volume.
 Rows:  Bar = this candle alone | Roll 4 = last 4 bars | Since 09:45 = day so far after the opening bar | CVD swing.
+Joint outlier (Mahalanobis) marker: square below the price candle and the last chip row. d = sqrt((x-mu)' S^-1 (x-mu)) with
+x = (|delta| %, price move signed along the delta, ln volume spike); OUTLIER when d^2 > 9.35 (chi-square, 3 df, 97.5%).
+Driver = component with the largest marginal z: PRICE- (absorbed), PRICE+ (efficient), SIZE (huge delta), VOLUME.
 CVD swing marker (diamond above the price candle and a chip in the last row): swing = (high_cvd - low_cvd) as % of
 the stock-day's average bar volume, ranked vs all bars.  TWO-WAY = top-20% swing whose net delta is <= 30% of the swing (heavy flow in
 both directions that netted out); SWING = top-20% swing that ended one-sided.
@@ -41,6 +44,7 @@ def peer_tables():
     ALONG the delta (positive = price followed the delta, negative = moved against it). Peers = windows with |D| >= DMIN."""
     pts = {k: [] for k in ("bar", "roll", "day")}
     swings = []
+    mpts = []
     for folder in sorted(glob.glob(os.path.join(HERE, "..", "..", "data", "CVD_Scanner_*"))):
         for p in glob.glob(os.path.join(folder, "*.csv")):
             try: d = load(p)
@@ -52,6 +56,9 @@ def peer_tables():
                 swings.append((d["high_cvd"][t] - d["low_cvd"][t]) / avgv * 100)
             for t in range(1, n):
                 pts["bar"].append(window(d, t, t)[:2])
+                Dm, Pm, _ = window(d, t, t)
+                if abs(Dm) >= DMIN:
+                    mpts.append((abs(Dm), (1 if Dm > 0 else -1) * Pm, math.log(d["volume"][t] / (sum(d["volume"][:t]) / t))))
                 if t >= 3:
                     pts["roll"].append(window(d, t - 3, t)[:2])
                     pts["day"].append(window(d, 1, t)[:2])
@@ -67,7 +74,39 @@ def peer_tables():
             stats.append((m, 1.4826 * mad))
         tables[k] = (edges, stats)
     tables["swing"] = sorted(swings)
+    tables["maha"] = fit_maha(mpts)
     return tables
+
+
+MAHA_CUT = 9.35          # chi-square(3 df) 97.5% quantile: squared distance above this = multivariate outlier
+
+
+def fit_maha(X):
+    """Mean, inverse covariance and marginal std of (|D|, Pd, ln volume spike) over all bars with |D| >= DMIN."""
+    mu = [st.mean(x[k] for x in X) for k in range(3)]
+    sd = [st.pstdev(x[k] for x in X) for k in range(3)]
+    S = [[sum((x[a] - mu[a]) * (x[b] - mu[b]) for x in X) / (len(X) - 1) for b in range(3)] for a in range(3)]
+    (a, b, c), (d_, e, f), (g, h, i) = S
+    det = a * (e * i - f * h) - b * (d_ * i - f * g) + c * (d_ * h - e * g)
+    Si = [[(e * i - f * h) / det, (c * h - b * i) / det, (b * f - c * e) / det], [(f * g - d_ * i) / det, (a * i - c * g) / det, (c * d_ - a * f) / det], [(d_ * h - e * g) / det, (b * g - a * h) / det, (a * e - b * d_) / det]]
+    return mu, Si, sd
+
+
+def maha_state(D, Pd, spike, table):
+    """Joint outlier test on (|D|, Pd, ln spike). Returns (label, distance, driver) where driver is the component with the
+    largest marginal z: PRICE- (price moved less than usual for the delta = absorbed), PRICE+ (more than usual), SIZE (very large
+    delta) or VOLUME (very high/low volume)."""
+    if abs(D) < DMIN: return "-", None, ""
+    mu, Si, sd = table
+    x = [abs(D), Pd, math.log(spike)]
+    dv = [x[k] - mu[k] for k in range(3)]
+    d2 = sum(dv[a] * Si[a][b] * dv[b] for a in range(3) for b in range(3))
+    dist = math.sqrt(max(d2, 0))
+    if d2 <= MAHA_CUT: return "-", dist, ""
+    z = [dv[k] / sd[k] for k in range(3)]
+    k = max(range(3), key=lambda j: abs(z[j]))
+    driver = ("PRICE-" if z[1] < 0 else "PRICE+") if k == 1 else ("SIZE" if k == 0 else "VOLUME")
+    return "OUTLIER", dist, driver
 
 
 ZMIN = 2.0
@@ -111,6 +150,7 @@ def build(sym, date, tables):
         b["roll"] = state(*window(d, i - 3, i)[:2], tables["roll"]) if i >= 3 else ("", None)
         b["day"] = state(*window(d, 1, i)[:2], tables["day"]) if i >= 3 else ("", None)
         b["sw"] = swing_state(b, tables["swing"], sum(V) / n)
+        b["mh"] = maha_state(D, (1 if D > 0 else -1) * P, V[i] / (sum(V[:i]) / i), tables["maha"]) if i >= 1 else ("-", None, "")
         bars.append(b)
     return d, bars
 
@@ -154,6 +194,12 @@ def render(sym, date, bars):
         if swl != "-":
             mx, my = x, py(b["h"]) - 12
             mark = f'<polygon points="{mx:.1f},{my-6:.1f} {mx+6:.1f},{my:.1f} {mx:.1f},{my+6:.1f} {mx-6:.1f},{my:.1f}" class="mk {"two" if swl=="TWO-WAY" else "one"}"/>'
+        mhl, mhd, mhdrv = b["mh"]
+        if mhd is not None:
+            tip += f'  |  Mahalanobis d {mhd:.1f}' + (f' OUTLIER (driver {mhdrv})' if mhl == "OUTLIER" else '')
+        if mhl == "OUTLIER":
+            qx, qy = x, py(b["l"]) + 12
+            mark += f'<rect x="{qx-5:.1f}" y="{qy-5:.1f}" width="10" height="10" class="mk mh"/>'
         s.append(f'<g><title>{tip}</title>{mark}<line x1="{x:.1f}" x2="{x:.1f}" y1="{py(b["h"]):.1f}" y2="{py(b["l"]):.1f}" class="w {cls}"/>'
                  f'<rect x="{x-bw/2:.1f}" y="{py(max(b["o"], b["c"])):.1f}" width="{bw:.1f}" height="{max(abs(py(b["o"])-py(b["c"])), 1):.1f}" class="c {cls}"/></g>')
     # CVD panel
@@ -194,10 +240,21 @@ def render(sym, date, bars):
         s.append(f'<g><title>{b["t"]} CVD swing {swp:.0f}% of avg bar volume (p{swpc:.0f}); net {swr*100:.0f}% of swing: {swl}</title><rect x="{x-step*.46:.1f}" y="{y}" width="{step*.92:.1f}" height="38" rx="4" style="fill:{fill}"/>'
                  f'<text x="{x:.1f}" y="{y+16}" class="chip{" n" if swl == "-" else ""}" text-anchor="middle">{swl}</text>'
                  f'<text x="{x:.1f}" y="{y+31}" class="chip2{" n" if swl == "-" else ""}" text-anchor="middle">{swp:.0f}% p{swpc:.0f}</text></g>')
+    y = E0 + 200
+    s.append(f'<text x="{left-8}" y="{y+22}" class="pan" text-anchor="end">Joint outlier</text>')
     for b in bars:
-        s.append(f'<text x="{X(b["i"]):.1f}" y="{E0+206}" class="ax" text-anchor="middle">{b["t"]}</text>')
+        mhl, mhd, mhdrv = b["mh"]; x = X(b["i"])
+        fill = "var(--maha)" if mhl == "OUTLIER" else "var(--none)"
+        cl_ = "" if mhl == "OUTLIER" else " n"
+        t1 = "OUTLIER" if mhl == "OUTLIER" else "-"
+        t2 = "" if mhd is None else (f"d{mhd:.1f} {mhdrv}" if mhl == "OUTLIER" else f"d{mhd:.1f}")
+        s.append(f'<g><title>{b["t"]} Mahalanobis distance {"n/a" if mhd is None else format(mhd, ".1f")}{" - OUTLIER, driver " + mhdrv if mhl == "OUTLIER" else ""}</title><rect x="{x-step*.46:.1f}" y="{y}" width="{step*.92:.1f}" height="38" rx="4" style="fill:{fill}"/>'
+                 f'<text x="{x:.1f}" y="{y+16}" class="chip{cl_}" text-anchor="middle">{t1}</text>'
+                 f'<text x="{x:.1f}" y="{y+31}" class="chip2{cl_}" text-anchor="middle">{t2}</text></g>')
+    for b in bars:
+        s.append(f'<text x="{X(b["i"]):.1f}" y="{E0+256}" class="ax" text-anchor="middle">{b["t"]}</text>')
     # legend
-    lx = left; ly = E0 + 232
+    lx = left; ly = E0 + 282
     for name, var, desc in (("STRONG", "var(--over)", "z <= -2 efficient"), ("NORM", "var(--norm)", "|z| < 2"), ("ABSORBED", "var(--ineff)", "z >= +2"),
                             ("AGAINST", "var(--against)", "z >= +2, price opposed"), ("-", "var(--none)", "|delta| < 10%")):
         s.append(f'<rect x="{lx}" y="{ly-10}" width="14" height="14" rx="3" style="fill:{var}"/><text x="{lx+20}" y="{ly+2}" class="lg">{name}: {desc}</text>')
@@ -205,19 +262,20 @@ def render(sym, date, bars):
     ly += 22; lx = left
     s.append(f'<polygon points="{lx+6},{ly-10} {lx+12},{ly-4} {lx+6},{ly+2} {lx},{ly-4}" class="mk two"/><text x="{lx+20}" y="{ly+2}" class="lg">TWO-WAY swing: heavy CVD swing that netted out (marker above the candle)</text>')
     s.append(f'<polygon points="{lx+526},{ly-10} {lx+532},{ly-4} {lx+526},{ly+2} {lx+520},{ly-4}" class="mk one"/><text x="{lx+540}" y="{ly+2}" class="lg">one-sided large swing</text>')
+    s.append(f'<rect x="{lx+700}" y="{ly-9}" width="11" height="11" class="mk mh"/><text x="{lx+718}" y="{ly+2}" class="lg">joint (Mahalanobis) outlier, below the candle</text>')
     s.append(f'<text x="{left}" y="{ly+28}" class="sub">Efficiency = robust z-score of the price move vs bars with similar |delta|. +z = moved less than usual (absorbed); -z = moved more; |z| >= 2 flagged.</text>')
-    s.append(f'<text x="{left}" y="{ly+46}" class="sub">CVD swing = (high CVD - low CVD) as % of the stock-day average bar volume, ranked vs all bars; TWO-WAY = top-20% swing that netted to 30% of itself or less.</text>')
-    H_ = E0 + 345
+    s.append(f'<text x="{left}" y="{ly+46}" class="sub">Swing = CVD high-low as % of avg bar volume (TWO-WAY: top 20%, netted to 30% or less). Joint outlier = Mahalanobis d > 3.06.</text>')
+    H_ = E0 + 400
     css = """
-:root{--bg:#fff;--fg:#1f2430;--mut:#6b7280;--grid:#e5e7eb;--box:#f8fafc;--band:#2563eb18;--up:#14a085;--dn:#e0463f;--over:#3b82f6;--norm:#9ca3af;--ineff:#f59e0b;--against:#e11d74;--none:#e5e7eb;--master:#6366f1;--chipfg:#fff;--swing:#9333ea}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f141c;--fg:#e5e7eb;--mut:#94a3b8;--grid:#243040;--box:#131a24;--band:#3b82f622;--up:#2dd4a4;--dn:#f87171;--over:#3b82f6;--norm:#6b7280;--ineff:#f59e0b;--against:#ec4899;--none:#2a3441;--master:#6366f1;--swing:#c084fc}}
+:root{--bg:#fff;--fg:#1f2430;--mut:#6b7280;--grid:#e5e7eb;--box:#f8fafc;--band:#2563eb18;--up:#14a085;--dn:#e0463f;--over:#3b82f6;--norm:#9ca3af;--ineff:#f59e0b;--against:#e11d74;--none:#e5e7eb;--master:#6366f1;--chipfg:#fff;--swing:#9333ea;--maha:#0891b2}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f141c;--fg:#e5e7eb;--mut:#94a3b8;--grid:#243040;--box:#131a24;--band:#3b82f622;--up:#2dd4a4;--dn:#f87171;--over:#3b82f6;--norm:#6b7280;--ineff:#f59e0b;--against:#ec4899;--none:#2a3441;--master:#6366f1;--swing:#c084fc;--maha:#22d3ee}}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
 svg{max-width:100%;height:auto;display:block;margin:0 auto}
 .title{font-size:20px;font-weight:700;fill:var(--fg)}.sub{font-size:12px;fill:var(--mut)}.ax{font-size:11px;fill:var(--mut)}.pan{font-size:12px;font-weight:600;fill:var(--mut)}
 .lbl{font-size:11px;fill:var(--mut)}.grid{stroke:var(--grid);stroke-width:1}.zero{stroke:var(--mut);stroke-width:1;stroke-dasharray:3 3;opacity:.6}.pbox{fill:var(--box);stroke:var(--grid)}
 .band{fill:var(--band)}.mline{stroke:#2563eb;stroke-width:1;stroke-dasharray:5 4;opacity:.7}
 .up{stroke:var(--up)}rect.up{fill:var(--up)}.dn{stroke:var(--dn)}rect.dn{fill:var(--dn)}.w{stroke-width:1.5}
-.mk{stroke:var(--swing);stroke-width:2}.mk.two{fill:var(--swing)}.mk.one{fill:none}
+.mk{stroke:var(--swing);stroke-width:2}.mk.two{fill:var(--swing)}.mk.one{fill:none}.mk.mh{stroke:var(--maha);fill:var(--maha)}
 .chip{font-size:11px;font-weight:700;fill:#fff}.chip2{font-size:11px;fill:#fff;opacity:.95}.chip.n,.chip2.n{fill:var(--mut)}.dl{font-size:10px;fill:var(--mut)}.lg{font-size:11px;fill:var(--fg)}
 """
     return (f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{sym} {date} delta efficiency</title><style>{css}</style></head><body>'
@@ -236,7 +294,7 @@ def main():
     print("wrote", out)
     if a.png:
         chrome = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
-        subprocess.run([chrome, "--headless=new", "--no-sandbox", "--disable-gpu", "--hide-scrollbars", f"--screenshot={a.png}", "--window-size=1160,1130", "file://" + os.path.abspath(out)], check=True, capture_output=True)
+        subprocess.run([chrome, "--headless=new", "--no-sandbox", "--disable-gpu", "--hide-scrollbars", f"--screenshot={a.png}", "--window-size=1160,1190", "file://" + os.path.abspath(out)], check=True, capture_output=True)
         print("wrote", a.png)
 
 

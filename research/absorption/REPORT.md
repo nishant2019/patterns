@@ -405,3 +405,41 @@ Like the percentile labels, none of these is a forecast; they describe how unusu
 Label test with the new chart labels (`efficiency_label_test.py`; return to the close vs the median
 stock, baseline +0.06%): bar-level AGAINST after selling −0.04% (t −0.8), STRONG after selling +0.03%; rolling
 and day-level AGAINST after buying +0.15% and +0.17% (t +2.0, 6/7 and 4/7 days), the same small divergence signal as before.
+
+---
+
+## Mahalanobis joint-outlier marker on the chart
+
+A new chip row ("Joint outlier") and a square below the price candle flag bars that are unusual
+in the **combination** of three things, not just in one: the size of the delta, the price move
+along the delta, and the volume spike.
+
+- **x = (|D|, Pd, ln volume spike)** for each bar with |delta| ≥ 10% of volume.
+- **Distance** d = √((x − μ)ᵀ S⁻¹ (x − μ)), with μ and S fitted on all 25,907 such bars
+  (mean |D| 30.7%, mean Pd 0.14 master ranges, mean ln spike −0.40; marginal std 17.4, 0.28, 0.83).
+- **OUTLIER** when d² > 9.35 (chi-square, 3 degrees of freedom, 97.5%), i.e. d > 3.06.
+- **Driver** = the component with the largest marginal z: **PRICE−** (price moved less than usual for the delta = absorbed),
+  **PRICE+** (price moved more than usual), **SIZE** (an exceptionally large delta) or **VOLUME**
+  (exceptionally high or low volume). Hover text shows d and the driver; non-outlier bars show their d value.
+
+It flags 4.3% of those bars (1,113; a normal model would give 2.5%, so the tails are heavier).
+The chart only tests bars with at least 10% net delta, so a heavy two-way bar with small net delta
+(for example IREDA's 12:15 bar with 7.2× volume and −3% delta) is not flagged here; the CVD swing marker covers it.
+
+On the ten charted stocks only IREDA has outliers: 09:45 (d 3.4, PRICE+, +278K delta moved price +1.45%) and
+11:45 (d 4.5, PRICE+, +258K delta, volume 3.2× the master's).
+
+**Forward return to the close by driver** (vs the median stock; baseline +0.055%; all 7 days):
+
+| Driver | Bars | Selling bars | Buying bars |
+|---|---|---|---|
+| PRICE− (absorbed) | 88 / 48 | +0.11% (t 0.8) | +0.15% (t 0.7) |
+| PRICE+ (efficient) | 127 / 216 | +0.17% (t 1.7) | +0.06% |
+| SIZE (huge delta) | 320 / 141 | **+0.21%** (t 3.9, 6/7 days) | +0.08% |
+| VOLUME | 84 / 89 | +0.22% (t 2.3) | **−0.20%** (t −2.0, 2/7 days) |
+| All outliers | 1,113 | | +0.116% (t 3.2) |
+
+Eight groups were tested, so only the large ones are worth a second look. Notably: selling bars whose delta is
+exceptionally large (SIZE) were followed by about +0.21% to the close (6 of 7 days), and high-volume buying
+outliers by −0.20%. These are consistent with large selling being followed by relief and with heavy buying
+being a poor sign, but they need more days before they are used.
