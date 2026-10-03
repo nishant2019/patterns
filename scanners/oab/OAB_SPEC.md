@@ -194,6 +194,56 @@ Baseline per day: 01-10 −0.04%, 15-09 +0.55% (shorts on a selloff), 16-09
 - **Longs are about breakeven** (50% win). OAB may only work long, and needs a
   better entry or exit than "close above window high, hold to close".
 
+## Improvement study (5 days; scripts in `research/absorption/`)
+
+Question: can the absorption research improve OAB? Tested features at the
+window end against return to close vs the average stock, on OAB (67 setups)
+and on the loose "base" set (448 setups) for more data.
+
+**Long-only trade** (`oab_long_test.py`): enter at the window-end close, stop
+at the master low, no costs.
+
+| Exit | Trades | Win | Avg / trade | Avg R | Stopped |
+|---|---|---|---|---|---|
+| Hold to close | 67 | 58% | +0.16% | +0.19 | 18 |
+| Target 1R | 67 | 61% | +0.16% | +0.18 | 17 |
+| Target 2R | 67 | 60% | +0.22% | +0.29 | 17 |
+| Target 3R | 67 | 58% | +0.16% | +0.19 | 18 |
+
+Median risk is 0.87% of entry. The window-end long (+0.16%) is better than the
+breakout entry (+0.04%) and the two-sided version (−0.11%). Target choice
+makes no meaningful difference. Per day: 17-09 +0.38% (74% win), 18-09
++0.19%, 16-09 +0.18%, 01-10 −0.10%, **15-09 −0.77% (0 of 5 won)**.
+
+**Refinements tested (none clearly improves OAB):**
+
+| Idea (from the research) | OAB result | Base set (n=448) |
+|---|---|---|
+| Near the day's low (SA was stronger there) | No effect (AUC 0.37) | No effect |
+| CVD selling ≤ 25% (very heavy selling is not absorbed) | +0.18% vs +0.41% for >25% (n=10) | **+0.08% vs −0.11%** |
+| Longer windows (≥ 4 bars) | +0.16% vs +0.25% for 3 bars | **+0.15% vs −0.10%** (5/5 days) |
+| Later windows (end ≥ 11:15) | No effect | No effect |
+| Volume ratios, last-bar delta, relative strength | AUC 0.43–0.60, noise | AUC 0.50–0.53 |
+
+The CVD-selling cap and minimum 4 bars help the loose set, but OAB's filters
+already capture that effect, so nothing is gained on OAB itself.
+
+**Market regime matters more than any feature.** Window end → close:
+
+| Market so far (avg stock since 09:15 close) | Setups | Absolute return | Win | vs market |
+|---|---|---|---|---|
+| Down more than 0.5% | 6 | **−0.52%** | 33% | +0.52% |
+| Otherwise | 61 | **+0.31%** | 70% | +0.19% |
+
+OAB holds up relative to a falling market but still loses in absolute terms.
+A long-only version should be skipped (or sized down) when the market is down
+more than ~0.5%. Only 6 setups on 2 days, so treat as a hypothesis.
+
+**Conclusion:** the current OAB parameters are already near what this data
+supports. The practical improvements are about how it is traded (long-only,
+enter at window end, stop at master low, skip falling markets), not extra
+entry filters. SAB cannot be added as a filter (see `REPORT.md`).
+
 ## Known limitations
 
 - **One trading day.** All thresholds were tuned on 01-10-2026. Treat them as
