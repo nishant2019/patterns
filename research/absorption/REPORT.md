@@ -144,3 +144,57 @@ re-tuned.
 - `grid.py`, `patterns.py` – the analysis (`python patterns.py split` for subgroups).
 - `absorption_scanner.py` – lists SAB and BEX events per stock and day.
 - `absorption_events.csv` – all SAB/BEX events for the 5 days.
+
+---
+
+## Delta power vs price move per candle (`delta_power.py`)
+
+Per-bar delta = `close_cvd − open_cvd`. Power of delta = how far price moved
+per unit of delta (price move per 10K of delta, in the delta's direction),
+plus where the bar's delta and range rank among all 36,456 stock-bars
+(percentile of |delta| % of volume, percentile of high-low range).
+
+**TCS 28-09** (the CSV bar deltas are −21.5K, −3.6K, −26.7K, …; the −25K and
+−37K quoted in discussion match the CVD *levels* after the 09:45 and 10:45
+bars, −25.1K and −36.8K, not the per-bar deltas):
+
+| Bar | Delta | Delta % of vol | \|delta\| pct-rank | HL % | HL pct-rank | Return | Move per 10K delta |
+|---|---|---|---|---|---|---|---|
+| 09:15 | −21.5K | −4.5 | 13 | 1.87 | 92 | −1.75% | **+0.82%** |
+| 09:45 | −3.6K | −1.4 | 4 | 0.63 | 50 | −0.15% | +0.40% |
+| **10:15** | **−26.7K** | −14.3 | 39 | 0.55 | 42 | −0.29% | **+0.11%** |
+| 10:45 | +15.0K | +10.9 | 31 | 0.41 | 25 | +0.08% | +0.05% |
+| 11:15 | +31.7K | +27.2 | 66 | 0.45 | 29 | +0.30% | +0.09% |
+| 11:45 | +47.8K | +27.0 | 66 | 0.59 | 46 | +0.52% | +0.11% |
+| 12:15 | +26.0K | +21.2 | 55 | 0.35 | 17 | +0.07% | +0.03% |
+| 12:45 | +42.9K | +28.6 | 68 | 0.37 | 19 | +0.28% | +0.07% |
+| 13:15 | +25.8K | +12.5 | 35 | 0.60 | 46 | +0.03% | +0.01% |
+| 13:45 | +1.8K | +2.0 | 6 | 0.26 | 7 | −0.13% | −0.71% |
+| 14:15 | +10.7K | +6.9 | 20 | 0.46 | 31 | −0.33% | −0.31% |
+| 14:45 | +0.5K | +0.2 | 1 | 0.43 | 27 | +0.02% | n/a |
+
+Reading:
+- The master bar moved price **0.82% per 10K of delta**; every later bar with
+  >= 10K delta moved it about **0.06%** (median), i.e. 14 times less. The
+  open was a thin, gap-driven move; the later sellers had far less impact.
+- The 10:15 bar had the **largest negative delta of the day** (−26.7K) in a
+  small candle (HL 0.55%, 30% of the master) that still undercut the master
+  low and closed lower (−0.29%); the next bar had no selling inside it.
+  Consistent with selling absorption, though price impact per 10K delta
+  (0.11) is not different from later buying bars, so it is not unique by this
+  measure.
+- **Buying lost power at the top:** from 13:15 buying delta (+25.8K, +1.8K,
+  +10.7K) produced +0.03%, −0.13% and −0.33%, i.e. price moved against buyers
+  as the range high was approached; this precedes the fade into the close.
+
+**Does price impact per unit of delta predict anything?** Across 12,869
+selling bars (delta <= −10% of volume) split into impact quintiles, and 9,437
+buying bars: forward returns are about the same in every quintile
+(+0.03% / +0.03% to +0.08% for selling, baseline +0.03% / +0.055%), with no
+monotone pattern. Only the coarse split shows anything: bars with delta
+>= 30% selling where price did **not** follow (n = 1,766) returned +0.11% to
+the close (t 4.7) vs +0.07% where price followed (baseline +0.055%), a small
+effect consistent with the selling-absorption result above.
+
+A linear model of bar move on delta % explains only 15% of bar-to-bar price
+movement (R² 0.15), too weak to give a per-candle "expected move".
