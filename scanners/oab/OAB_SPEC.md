@@ -151,6 +151,20 @@ CASTROLIND, GRASIM, INDUSINDBK.
   added nothing there. Possibly a defensive pattern: it holds up in selloffs
   but doesn't lead rallies. Too few days to tell.
 
+## Five-day summary (window end → close, long, vs market median)
+
+| Day | Market | OAB setups | OAB breakout | Baseline breakout | OAB vs market | Baseline vs market | OAB beat market |
+|---|---|---|---|---|---|---|---|
+| 01-10 (tuning) | Down | 8 | 75% | 15% | +0.69% | −0.04% | 6/8 |
+| 15-09 | Selloff | 5 | 20% | 14% | +0.70% | +0.32% | 4/5 |
+| 16-09 | Rally | 7 | 43% | 17% | −0.24% | −0.30% | 2/7 |
+| 17-09 | Flat | 27 | 70% | 48% | +0.55% | +0.36% | 24/27 |
+| 18-09 | Mild up | 20 | 55% | 52% | −0.19% | −0.05% | 8/20 |
+| **All** | | **67** | **60%** | **33%** | **+0.27%** | **+0.05%** | **66%** |
+
+Excluding the tuning day: 59 setups, breakout rate above baseline on all four
+days, and OAB beat the market on 2 of 4 days (strongly on 17-09).
+
 ## Two-sided trade backtest (`two_sided.py`)
 
 After the signal, trade whichever side of the window closes outside first:

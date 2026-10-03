@@ -64,6 +64,17 @@ With the 15× block-trade cap. Before the cap, 01-10 also included WEWORK
 STARHEALTH. STARHEALTH was also cited as a motivating example in the original
 scanner spec.
 
+## Later days (thresholds unchanged)
+
+| Day | Market | Setups | Breakouts | Avg to close | Avg vs market | Window low broken |
+|---|---|---|---|---|---|---|
+| 16-09-2026 | +1.80% | 0 | — | — | — | — |
+| 17-09-2026 | −0.08% | 26 | 15 | +0.12% | +0.13% | 8 |
+| 18-09-2026 | +0.42% | 8 | 6 | +0.11% | −0.26% | 3 |
+
+All five days: 42 setups; vs market roughly +0.1% on average, driven by a few
+large winners (YATHARTH, SHREEJISPG, JSL). No clear edge yet.
+
 ## Known limitations
 
 - **9 setups over 2 days** is far too few to judge the pattern.
