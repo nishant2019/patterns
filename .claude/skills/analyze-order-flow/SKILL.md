@@ -1,7 +1,11 @@
 ---
 name: analyze-order-flow
-description: 基于足迹图、成交量分布(VRVP/Volume Profile)、Delta 等可观测数据，推断市场主动/被动成交行为，输出带证据链的交易复盘报告。适用于股票/期货/加密等可获取逐笔成交与量价分布数据的标的。当用户上传交易图表（如足迹图、VRVP 图、Delta 图）并请求分析时使用此 Skill。
+description: 基于足迹图、成交量分布(VRVP/Volume Profile)、Delta 等可观测数据，推断市场主动/被动成交行为，输出带证据链的交易复盘报告。适用于股票/期货/加密等可获取逐笔成交与量价分布数据的标的。当用户上传交易图表（如足迹图、VRVP 图、Delta 图）并请求分析时使用此 Skill。Always respond in English.
 ---
+
+# Output Language (MANDATORY)
+
+**Always write every response in English**, even though this skill's instructions are written in Chinese. Translate all section headings, table labels, templates, the data-limitation notice and the disclaimer into English when producing output. Keep the standard English trading terms as-is (POC, HVN, LVN, VPOC, Delta, CVD, Absorption, Exhaustion, Initiation, Imbalance).
 
 # 订单流分析 Skill
 
