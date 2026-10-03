@@ -110,6 +110,25 @@ test half has only ~4–6 setups, so this is noisy.
 | JSWSTEEL | 10:15–11:15 | 10:45 (+0.01%, 19) | 0.84 | — | −1.75% | — |
 | ZEEL | 09:45–10:45 | 10:45 (+0.01%, 14) | 0.52 | — | −2.00% | — |
 
+## Out-of-sample day: 15-09-2026 (507 stocks)
+
+Parameters were **not** changed after seeing this day.
+
+| Day | Market (median stock, 09:15 close → EOD) | Stocks up | Baseline setups → breakouts | OAB setups → breakouts | OAB window → close |
+|---|---|---|---|---|---|
+| 01-10-2026 (tuning day) | −0.75% | 28% | 86 → 13 (15%) | 8 → 6 (75%) | +0.13% |
+| 15-09-2026 (unseen) | −2.23% | 6% | 37 → 5 (14%) | 5 → 1 (20%) | −0.72% |
+
+15-09 setups: CAMS, CANBK, LLOYDSME (breakout 15:15), MCX, PNB.
+
+- The 75% breakout rate did **not** carry over; on the unseen day OAB was
+  barely above baseline (20% vs 14%, n=5).
+- 15-09 was a broad selloff (94% of stocks down). The OAB picks lost less
+  than the median stock (−0.72% vs about −1.6% from 10:15), a possible
+  relative-strength effect, but n=5.
+- Combined (2 days): 13 setups, 7 breakouts (54%); split-half out-of-sample
+  31% vs 14% baseline. The combined number is inflated by the tuning day.
+
 ## Known limitations
 
 - **One trading day.** All thresholds were tuned on 01-10-2026. Treat them as
