@@ -132,3 +132,82 @@ breakout-bar delta defines the signal.
    did lose about 0.36% against the market afterwards, consistent with the fade.
 4. Not yet tested: stops/targets, volume thresholds beyond a simple ratio,
    other timeframes. More days are needed before any of this is relied on.
+
+---
+
+# Part 3: what inside the coil can a user actually use? (`coil_features.py`)
+
+Population: >= 3 of the first 4 bars inside the master, decision at 11:15
+(n = 1,288; 53% later break out of the master range, 36% of those up-first by
+count: 248 up, 436 down). 14 order-flow and structure features were tested
+against three questions: **which edge breaks first**, **will it break at all**,
+and **does the break hold**. AUC 0.50 = no information.
+
+| Feature | Which way (AUC) | Which way, within price-location terciles | Breaks at all (AUC) | Break holds (AUC) |
+|---|---|---|---|---|
+| Close position in master range | **0.87** | **0.67** | 0.43 | 0.49 |
+| Coil delta % | 0.64 | **0.52** | 0.45 | 0.48 |
+| Delta, last 2 coil bars | 0.67 | 0.52 | 0.45 | 0.46 |
+| Delta acceleration | 0.61 | 0.50 | 0.49 | 0.49 |
+| Positive-delta bars (of 4) | 0.61 | 0.51 | 0.45 | 0.48 |
+| CVD position vs master CVD range | 0.60 | 0.49 | 0.49 | 0.49 |
+| CVD low held above master CVD low | 0.52 | 0.47 | 0.51 | 0.52 |
+| Absorption bars inside coil | 0.48 | 0.50 | 0.50 | 0.50 |
+| **Volume trend (2nd half / 1st half)** | 0.56 | 0.55 | **0.60** | 0.45 |
+| Last coil bar volume vs coil average | 0.56 | 0.54 | **0.58** | 0.46 |
+| Coil volume vs master volume (dry-up) | 0.56 | 0.48 | 0.51 | 0.47 |
+| Master delta % | 0.51 | 0.48 | 0.55 | 0.46 |
+
+## What the data says
+1. **Which way: price location, not delta.** Delta looks informative on its own
+   (AUC 0.61–0.67) only because delta and price move together; once price
+   location is held fixed it falls to 0.50–0.52. Delta inside the coil adds
+   nothing about direction.
+2. **When: rising volume.** Whether the coil breaks out at all is the one thing
+   order flow helps with. Volume rising late in the coil (2nd half / 1st half
+   volume) lifts the break rate from **43% (falling) to 62% (rising)**
+   (AUC 0.60, ~5 standard errors); the last coil bar's volume against the coil
+   average shows the same (45% → 61%).
+3. **Absorption bars, CVD structure and the master's delta do nothing** here.
+4. **Whether the break holds:** nothing inside the coil predicts it. The only
+   predictor is the breakout bar itself (Part 2: delta in the break direction
+   >= 15% means the break tends to fail).
+
+## Decision grid at 11:15 (coil = 3+ of first 4 bars inside the master)
+
+Cell = stocks, break-out rate, share of breaks that go **up** first.
+
+| Close position in master range | Volume falling | Volume flat | Volume rising |
+|---|---|---|---|
+| **Lower third** | n=138, 53% break, **5%** up | n=142, 73% break, **8%** up | n=147, 74% break, **10%** up |
+| Middle third | n=219, 36% break, 35% up | n=207, 41% break, 38% up | n=158, 45% break, 38% up |
+| **Upper third** | n=73, 47% break, **85%** up | n=80, 58% break, **85%** up | n=124, 69% break, **83%** up |
+
+Volume trend cut-offs: falling <= 0.51, rising > 0.83.
+
+How to read it: lower third plus flat/rising volume means a break is likely
+(about 3 in 4) and it is almost always **down**. Upper third plus rising volume
+means about 7 in 10 break and 83% of those are **up**. Middle-third coils
+resolve least often (36–45%) and show no direction.
+
+## What this does not give you
+- **No return edge.** The grid says which master edge is likely to be touched
+  and how likely, not that trading it pays. From Part 1, returns from 11:15 to
+  14:45 are about +0.06% to +0.10% (market-adjusted) in every location bucket.
+- **Breaking down is mechanical for lower-third coils**: price is already near
+  the low edge.
+- **After the break, only the Part 2 rule has support:** a break with delta
+  >= 15% in the break direction tends to reverse (about +0.12% fade return,
+  not enough to survive stops or costs; see `scanners/coil_fade`).
+- Six days. Treat the grid as a description of this sample until more days
+  confirm it.
+
+## Practical checklist for a user
+1. Is it a coil? (3+ of the first 4 bars inside the master.)
+2. Where is price in the master range? That sets the likely side (lower third:
+   down; upper third: up; middle: unclear).
+3. Is volume rising in the coil? If yes, expect a decision soon; if falling,
+   expect it to stay range-bound (about half stay inside).
+4. Ignore coil delta for direction. Use it only as context.
+5. When the break comes, check its delta: strong delta in the break direction
+   (>= 15% of bar volume) is a warning of a failed break, not a confirmation.
