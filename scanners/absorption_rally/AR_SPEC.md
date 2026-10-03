@@ -36,8 +36,12 @@ volume).
 | 1 | Window of 1–2 consecutive bars, starting 09:45 to 13:15 | `max_bars=2`, `first_start=1`, `last_start=8` |
 | 2 | Net CVD selling `−(close_cvd[end] − open_cvd[start]) / Σvol` | `≥ 25%` |
 | 3 | Window price change `(close[end] − open[start]) / open[start]` | `≥ +0.3%` |
-| 4 | Volume spike: avg window bar volume / avg of all earlier bars | `≥ 2.0×` |
+| 4 | Volume spike: avg window bar volume / avg of all earlier bars | `2.0× … 15.0×` (`min_vol_spike`, `max_vol_spike`) |
 | 5 | Relative strength at window end: stock return since 09:15 close minus market median at that bar | `≥ 0%` |
+
+The 15× cap excludes single-bar block trades, which are one large print
+rather than continuous passive buying (WEWORK 01-10 11:15: 92% selling on 36×
+volume).
 
 The earliest-ending valid window per stock is kept. Every rule uses only data
 up to the window end; the market median is computed across the folder at the
@@ -51,19 +55,22 @@ return to close, return vs market to close) are for validation only.
 | Day | Market (median, 09:15 close → EOD) | Setups | Breakouts | Avg to close | Avg vs market | Window low broken |
 |---|---|---|---|---|---|---|
 | 15-09-2026 | −2.45% | 1 (DABUR) | 1 | +0.57% | +2.21% | 0 |
-| 01-10-2026 | −0.72% | 8 | 4 | +0.16% | +0.78% | 7 of 8 |
+| 01-10-2026 | −0.72% | 7 | 3 | +0.11% | +0.72% | 6 of 7 |
 
-01-10 setups: WEWORK, SHREEJISPG, BLISSGVS, IXIGO, SRF, CIPLA, SKIPPER,
+With the 15× block-trade cap. Before the cap, 01-10 also included WEWORK
+(breakout 11:45, +0.53% to close, +1.22% vs market).
+
+01-10 setups: SHREEJISPG, BLISSGVS, IXIGO, SRF, CIPLA, SKIPPER,
 STARHEALTH. STARHEALTH was also cited as a motivating example in the original
 scanner spec.
 
 ## Known limitations
 
 - **9 setups over 2 days** is far too few to judge the pattern.
-- **Window lows usually break.** On 01-10, 7 of 8 dipped below the window low
+- **Window lows usually break.** On 01-10, 6 of 7 dipped below the window low
   afterward (down 0.8–4.6%), so a stop at the window low would usually be hit.
-- **Extreme spikes may be block trades.** WEWORK 11:15 (92% selling, 36×
-  volume) may be a single block deal rather than continuous absorption.
+- **The 15× cap is a judgement call** based on one case (WEWORK). The next
+  largest spike in the results is DABUR at 7.2×.
 - Both days were down days. Behaviour on up days is unknown.
 
 ## Usage

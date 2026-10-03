@@ -24,6 +24,7 @@ PARAMS = dict(
     min_cvd_selling=25.0,    # net CVD selling as % of window volume
     min_price_chg=0.3,       # window price change (close[end] vs open[start]) %
     min_vol_spike=2.0,       # avg window bar volume / avg of all prior bars
+    max_vol_spike=15.0,      # above this, likely a single block trade, not absorption
     min_rel_strength=0.0,    # (stock - market median) return since 09:15 close, at window end, %
 )
 
@@ -55,7 +56,7 @@ def scan_stock(d, mkt, p=PARAMS):
             rel = (C[e] - C[0]) / C[0] * 100 - mkt[e]
             if cvd_sell < p["min_cvd_selling"] or price_chg < p["min_price_chg"]:
                 continue
-            if spike < p["min_vol_spike"] or rel < p["min_rel_strength"]:
+            if not p["min_vol_spike"] <= spike <= p["max_vol_spike"] or rel < p["min_rel_strength"]:
                 continue
             wh, wl = max(H[s:e + 1]), min(L[s:e + 1])
             bo = next((j for j in range(e + 1, n) if C[j] > wh), None)
