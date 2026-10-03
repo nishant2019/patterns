@@ -82,6 +82,27 @@ The 3-bar bullish divergence (price up while CVD falls) adds +0.11% to the
 close, but it fires on 1,000+ bars and does little over the next hour.
 The bearish divergence has no edge.
 
+## SAB as a filter on OAB
+
+`oab_sab_filter.py` checks whether an SAB bar occurs inside each OAB window
+(67 OAB setups, 5 days; return = window end → close vs average stock).
+
+| OAB subset | Setups | Breakout | vs market | Beat market |
+|---|---|---|---|---|
+| All OAB | 67 | 60% | +0.21% | 58% |
+| SAB inside window | **2** | 50% | +1.01% | 2/2 |
+| No SAB inside window | 65 | 60% | +0.18% | 57% |
+| Relaxed SAB (any volume/location) inside window | 49 | 59% | +0.23% | 55% |
+| No relaxed SAB inside window | 18 | 61% | +0.15% | 67% |
+
+**SAB does not work as a filter on OAB, mainly because they almost never
+co-occur.** OAB windows are quiet by design (heavy bar CVD ≤ 45% of volume,
+compressing range), while SAB needs a volume spike of 1.5–3× and CVD ≤ −30%.
+Only PNB (15-09) and TORNTPHARM (17-09) had both. Relaxing SAB to any volume
+makes it overlap (49 of 67) but then it adds nothing (+0.23% vs +0.15%,
+breakout rate unchanged). They are two separate signals, best used
+independently.
+
 ## Caveats
 
 - **Five days.** Results are consistent across days but the sample is still
