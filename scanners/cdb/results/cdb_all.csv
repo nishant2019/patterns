@@ -1,0 +1,2 @@
+symbol,date,climax_delta,climax_delta_pct,climax_close_loc,climax_low,range_start,range_end,range_bars,range_high,range_low,range_vol_vs_climax,range_width_vs_climax,test_bar,range_net_delta,breakout,breakout_vol_vs_range,breakout_delta,entry,max_up_pct,max_down_pct,to_close_pct,vs_market_to_close_pct,range_high_lost,range_low_lost
+APOLLOTYRE,01-10-2026,-16088,-15.1,0.29,392.85,09:45,11:45,5,397.75,394.25,0.16,0.37,10:45,10380,12:15,7.4,24654,399.5,1.81,-0.15,1.13,0.87,False,False
