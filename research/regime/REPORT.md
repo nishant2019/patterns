@@ -178,3 +178,26 @@ six decision times and 7 days: A +0.17% (6 of 7 days, was +0.24% over 6 of 6), B
 C2 +0.12%, D −0.03% (2 of 7 days), D2 +0.06%, E +0.12% (7 of 7 days). The A advantage shrinks
 from about +0.19% to about +0.11% over baseline, and the C weakness is gone, so
 treat the playbook's "avoid C" advice as unproven. See `research/day_reports/29-09-2026_out_of_sample.md`.
+
+---
+
+## Watchlist flag: SIZE-driven selling outliers (lower third + inside master)
+
+The regime summary page now opens with a **Watchlist** section and adds a **SIZE sell outlier hh:mm** flag in the Notes column of any stock that qualifies.
+
+- **Qualifies** when, at a bar from 10:45 on (the population of the 7-day study), the bar had at least 10% net selling delta and was a Mahalanobis joint outlier (d > 3.06) driven by the **size** of the selling delta, while the close was in the **lower third of the day's range so far** and **inside the master candle**.
+- **Columns:** stock, outlier bar (marked "latest" if it is the last completed bar), delta (shares), share of volume, size in average bars, volume spike, distance d, close, master range, and the stock's regime now. Review pages (`--outcomes`) add the raw return from the outlier bar to the close.
+- **History line** (`research/absorption/REPORT.md`): 72 such bars returned +0.55% to the close vs the median stock (median +0.49%, 74% win, 6 of 7 days); all SIZE-driven selling outliers +0.21%; either condition alone about +0.04%. The subgroup was chosen after examining about 25 splits and must be confirmed forward.
+- **Invalidation:** a close below the master low, or below the day's low since 09:45.
+
+Counts and raw return from the outlier bar to the close (not vs the median stock; the median stock lost 0.4% to 0.5% after 11:15 on both days):
+
+| Day, time | Qualifying bars | Stocks | Raw return to close |
+|---|---|---|---|
+| 28-09, 11:15 | 4 | 4 | −0.23% |
+| 28-09, 12:45 | 8 | 7 | −0.07% |
+| 29-09, 11:15 | 2 (1 at the latest bar) | 2 | +0.86% |
+| 29-09, 12:45 | 2 | 2 | +0.86% |
+
+The flag is rare (2 to 8 bars per day), so a day gives only a handful of observations; it will take many days to confirm.
+Pages: `summaries/regime_summary_<date>_<time>.html` (live) and `_review.html` (with outcomes).

@@ -9,6 +9,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "scanners", "oab")); sys.path.insert(0, HERE)
 from oab_scanner import load
 from regime_scanner import analyse, NAMES, PLAN, TIMES
+sys.path.insert(0, os.path.join(HERE, "..", "absorption"))
+from efficiency_chart import peer_tables, maha_state, window  # joint-outlier test (Mahalanobis)
+from regime_study import structure
 
 # Historical statistics from REPORT.md (6 days, pooled over six decision times; vs the median stock)
 STATS = {
@@ -37,7 +40,26 @@ tr:last-child td{border-bottom:0}.pos{color:var(--A)}.neg{color:var(--D)}.flag{f
 details{margin-top:8px}summary{cursor:pointer;color:var(--mut);font-size:13px}.note{color:var(--mut);font-size:12px;margin-top:18px;border-top:1px solid var(--line);padding-top:10px}
 """
 
-def rows_for(folder, t):
+def size_outliers(d, t, tables):
+    """SIZE-driven selling outliers (Mahalanobis d > 3.06, driver SIZE, delta < -10%) among bars 1..t. combo = at that bar (10:45 or later, the
+    population of the 7-day study) the close was in the lower third of the day's range so far AND inside the master candle."""
+    O, H, L, C, V = d["open_price"], d["high_price"], d["low_price"], d["close_price"], d["volume"]
+    mH, mL = H[0], L[0]; avgv = sum(V) / len(V); out = []
+    for i in range(1, t + 1):
+        D, P, raw = window(d, i, i)
+        if D >= -10: continue
+        lab, dist, drv = maha_state(D, -P, V[i] / (sum(V[:i]) / i), tables["maha"])
+        if lab != "OUTLIER" or drv != "SIZE": continue
+        hi, lo = max(H[:i + 1]), min(L[:i + 1])
+        dpos = (C[i] - lo) / max(hi - lo, 1e-9)
+        inside = structure(C[i], mH, mL).startswith("inside")
+        out.append(dict(i=i, time=d["Time"][i][11:16], d=dist, D=D, delta=d["close_cvd"][i] - d["open_cvd"][i], size=abs(d["close_cvd"][i] - d["open_cvd"][i]) / avgv, spike=V[i] / (sum(V[:i]) / i),
+                        close=C[i], dpos=dpos, inside=inside, combo=i >= 3 and dpos < 1 / 3 and inside, new=(i == t),
+                        to_close=(C[11] - C[i]) / C[i] * 100 if len(C) > 11 else None))
+    return out
+
+def rows_for(folder, t, tables=None):
+    tables = tables or peer_tables()
     out = []
     for path in sorted(glob.glob(os.path.join(folder, "*.csv"))):
         try: d = load(path)
@@ -50,6 +72,7 @@ def rows_for(folder, t):
         r["to_lo"] = (r["close"] - r["master_low"]) / mr
         n = len(d["close_price"]); C = d["close_price"]
         r["to_close"] = (C[11] - C[t]) / C[t] * 100 if n > 11 else None
+        r["size_out"] = size_outliers(d, t, tables)
         out.append(r)
     return out
 
@@ -76,6 +99,8 @@ def table(k, rs, outcomes):
         if r["undercut"]: notes.append(f"<span class=flag>undercut {r['day_low']:g}</span>")
         if r["vol_trend"] >= 1.3: notes.append("<span class=flag>volume rising</span>")
         if r["inside"] >= 3: notes.append(f"<span class=flag>coil {r['inside']} bars</span>")
+        so = [x for x in r.get("size_out", []) if x["combo"]]
+        if so: notes.append(f"<span class=flag style='border-color:var(--E);color:var(--E)'>SIZE sell outlier {so[-1]['time']}</span>")
         cls = lambda v: "pos" if v > 0 else "neg"
         cells = [f"<td>{html.escape(r['symbol'])}</td>", f"<td>{r['close']:g}</td>", f"<td>{r['master_low']:g} – {r['master_high']:g}</td>",
                  f"<td>{('above high' if r['struct'].startswith('ABOVE') else 'below low' if r['struct'].startswith('BELOW') else r['struct'].replace('inside, ', '') + ' ' + format(r['pos']*100, '.0f') + '%')}</td>",
@@ -86,6 +111,31 @@ def table(k, rs, outcomes):
     o.append("</tbody></table></div>")
     return "".join(o)
 
+def watchlist(rows, outcomes):
+    items = []
+    for r in rows:
+        for x in r.get("size_out", []):
+            if x["combo"]: items.append((r, x))
+    items.sort(key=lambda rx: (-rx[1]["new"], -rx[1]["i"], -rx[1]["d"]))
+    head = ["Stock", "Outlier bar", "Delta", "% of vol", "Size*", "Spike", "d", "Close", "Master range", "Now (regime)"] + (["From outlier to close (raw)"] if outcomes else [])
+    o = [f"<section style='--c:var(--E)'><h2>Watchlist · SIZE-driven selling outliers, lower third + inside master <span class=n>{len(items)} bars in {len({r['symbol'] for r, _ in items})} stocks (bars at this decision time first)</span></h2>"
+         "<p class=stat>History (7 days, research/absorption/REPORT.md): 72 such bars returned <b>+0.55%</b> to the close vs the median stock (median +0.49%, 74% win, positive on 6 of 7 days); all SIZE-driven selling outliers +0.21%; "
+         "either condition alone about +0.04%. The subgroup was found after examining about 25 splits: a hypothesis to confirm on new days, not a rule.</p>"
+         "<p class=plan><b>What it is:</b> a bar with at least 10% net selling delta that is a joint outlier (Mahalanobis d &gt; 3.06) because the selling delta was exceptionally large, "
+         "while price sat in the lower third of the day's range and inside the master candle (bars from 10:45 on, as in the study). <b>Invalid if:</b> a close below the master low or the day's low since 09:45. *Size = delta in average-bar volumes.</p>"]
+    if not items:
+        o.append("<p class=stat>No stocks with this flag.</p></section>"); return "".join(o)
+    o.append("<div class=tbl><table><thead><tr>" + "".join(f"<th{' class=l' if h in ('Now (regime)',) else ''}>{h}</th>" for h in head) + "</tr></thead><tbody>")
+    for r, x in items[:40]:
+        cells = [f"<td>{html.escape(r['symbol'])}</td>", f"<td>{x['time']}{' (latest)' if x['new'] else ''}</td>", f"<td class=neg>{x['delta']/1000:+.1f}K</td>", f"<td>{abs(x['D']):.0f}%</td>", f"<td>{x['size']:.2f}</td>", f"<td>{x['spike']:.1f}×</td>", f"<td>{x['d']:.1f}</td>", f"<td>{x['close']:g}</td>",
+                 f"<td>{r['master_low']:g} – {r['master_high']:g}</td>", f"<td class=l>{r['regime']} · {r['struct'].replace('inside, ', '')}</td>"]
+        if outcomes: cells.append(f"<td class={'pos' if (x['to_close'] or 0) > 0 else 'neg'}>{'' if x['to_close'] is None else format(x['to_close'], '+.2f') + '%'}</td>")
+        o.append("<tr>" + "".join(cells) + "</tr>")
+    o.append("</tbody></table></div>")
+    if len(items) > 40: o.append(f"<p class=stat>{len(items)-40} more bars not shown.</p>")
+    o.append("</section>")
+    return "".join(o)
+
 def render(date, tm, rows, top, outcomes):
     n = len(rows)
     above = sum(r["struct"].startswith("ABOVE") for r in rows); below = sum(r["struct"].startswith("BELOW") for r in rows)
@@ -93,6 +143,7 @@ def render(date, tm, rows, top, outcomes):
     pdate = date.replace("-", " ")
     body = [f"<h1>Regime summary · {pdate} · {tm}</h1><p class=sub>{n} stocks. Regimes from master-candle structure and price-vs-delta flow since the 09:45 open. Levels are the master (09:15) candle's range and the day's low since 09:45. *Delta = net CVD change since 09:45 as % of volume; Price = price change since 09:45; Vol = volume trend (recent bars vs earlier).</p>"]
     body.append("<div class=chips>" + f"<span class=chip>Above master high <b>{above}</b> ({100*above/n:.0f}%)</span><span class=chip>Below master low <b>{below}</b> ({100*below/n:.0f}%)</span>" + "".join(f"<span class=chip>{k} <b>{counts[k]}</b></span>" for k in ORDER) + "</div>")
+    body.append(watchlist(rows, outcomes))
     for k in ORDER:
         rs = sorted([r for r in rows if r["regime"] == k], key=rank_key(k))
         bias, trig, inv = PLAN[k]
