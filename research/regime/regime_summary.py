@@ -12,13 +12,13 @@ from regime_scanner import analyse, NAMES, PLAN, TIMES
 
 # Historical statistics from REPORT.md (6 days, pooled over six decision times; vs the median stock)
 STATS = {
- "A": "+0.24% to close, positive on 6/6 days; 56% later break the master range, 69% of those up",
- "B": "+0.07%, 5/6 days; side set by location: upper third breaks up ~80-93%, lower third breaks down ~91%",
- "C": "-0.06%, 2/6 days: chasing underperforms (baseline +0.05%)",
- "C2": "+0.10%, 4/6 days: trend intact, no extra edge",
- "D": "-0.04%, 2/6 days: weak, avoid longs",
- "D2": "+0.06%, 4/6 days: reclaim candidate, unproven",
- "E": "+0.09%, 6/6 days: no return edge; first break goes down ~65%",
+ "A": "+0.17% to close vs the median stock (baseline +0.06%), positive on 6/7 days; 53% later break the master range, 66% of those up",
+ "B": "+0.07%, 6/7 days; side set by location: upper third breaks up ~80-93%, lower third breaks down ~91%",
+ "C": "+0.005%, 3/7 days: no edge over the baseline; was negative over the first 6 days, so chasing is unproven rather than proven bad",
+ "C2": "+0.12%, 5/7 days: trend intact, modest",
+ "D": "-0.03%, 2/7 days: weak, avoid longs",
+ "D2": "+0.06%, 5/7 days: reclaim candidate, unproven",
+ "E": "+0.12%, 7/7 days (the most consistent regime); first break goes down ~65%",
 }
 ORDER = ["A", "B", "C", "C2", "D", "D2", "E"]
 CSS = """
@@ -103,7 +103,7 @@ def render(date, tm, rows, top, outcomes):
             if len(rs) > top: body.append(f"<details><summary>Show the other {len(rs)-top} stocks</summary>{table(k, rs[top:], outcomes)}</details>")
         else: body.append("<p class=stat>No stocks in this regime.</p>")
         body.append("</section>")
-    body.append("<p class=note>Edges are small and relative to the median stock (regime A about +0.19% above a +0.05% baseline, before costs), measured over 6 trading days. Use the regimes to decide where to look and what to avoid, not as automatic entries. Rankings: A upper-third first then heaviest absorbed selling; B closest to a master edge; C largest move; D most selling; D2 closest to the master low; E heaviest buying.</p>")
+    body.append("<p class=note>Edges are small and relative to the median stock (regime A about +0.11% above a +0.06% baseline, before costs), measured over 7 trading days and shrinking as days are added. Use the regimes to decide where to look and what to avoid, not as automatic entries. Rankings: A upper-third first then heaviest absorbed selling; B closest to a master edge; C largest move; D most selling; D2 closest to the master low; E heaviest buying.</p>")
     return f"<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>Regime summary {pdate} {tm}</title><style>{CSS}</style></head><body><main>{''.join(body)}</main></body></html>"
 
 def main():
@@ -113,7 +113,7 @@ def main():
     a = ap.parse_args()
     folder = os.path.join(HERE, "..", "..", "data", f"CVD_Scanner_{a.date}")
     rows = rows_for(folder, TIMES[a.time])
-    out = a.output or os.path.join(HERE, "summaries", f"regime_summary_{a.date}_{a.time.replace(':', '')}.html")
+    out = a.output or os.path.join(HERE, "summaries", f"regime_summary_{a.date}_{a.time.replace(':', '')}{'_review' if a.outcomes else ''}.html")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     open(out, "w").write(render(a.date, a.time, rows, a.top, a.outcomes))
     print("wrote", out, f"({len(rows)} stocks)")
