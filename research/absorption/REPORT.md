@@ -250,3 +250,55 @@ close; baseline +0.03% / +0.05%)
 - The effect sizes (about 0.1%) are small, similar to the earlier absorption
   results, and the rolling buckets are not monotone. Efficiency is a useful
   descriptive read of who is in control, but not a stand-alone edge.
+
+---
+
+## Efficiency labels on a candle chart (`efficiency_chart.py`)
+
+```bash
+python research/absorption/efficiency_chart.py TCS 28-09-2026 --png tcs.png   # writes charts/TCS_28-09-2026.html
+```
+
+One self-contained HTML/SVG per stock-day (light and dark themes, hover tooltips
+on every candle): price candles with the master range shaded, CVD candles
+(open/high/low/close), per-bar delta, and three label rows: **Bar** (this
+candle alone), **Roll 4** (last 4 bars) and **Since 09:45** (day so far).
+Examples: `charts/TCS_28-09-2026.html` / `.png`.
+
+**Definition used on the chart (changed from the DE ratio above).** The
+regression-based DE ratio is skewed: because delta explains only 15% of price
+movement, the fitted impact is tiny and 42% of selling windows came out
+"over-efficient". The chart therefore ranks each window against peers with a
+similar |delta| (|delta| decile, pooled over all stocks and days):
+
+| Label | Rule |
+|---|---|
+| STRONG | price moved more than 67% of peers with the same delta |
+| NORM | 33rd–67th percentile |
+| ABSORBED | at or below the 33rd percentile (delta did little) |
+| AGAINST | price moved opposite to the delta |
+| – | \|net delta\| < 10% of volume |
+
+**TCS 28-09 on the chart:** the 10:45 (+15K), 12:15 (+26K) and 13:15 (+26K)
+bars are ABSORBED (percentiles 21, 18 and 8), the 11:45 (+48K) bar STRONG (76);
+Roll 4 goes NORM → STRONG (12:45) → NORM → ABSORBED (13:45) → AGAINST (14:15);
+Since 09:45 turns ABSORBED at 14:15. The 10:15 selling bar (−26.7K) ranks NORM
+(p59), not absorbed, when compared with peers of similar delta: its 0.29% move
+is mid-pack once the stock's large opening range is accounted for.
+
+**Do the labels predict anything?** (`efficiency_label_test.py`, forward to the
+close vs the median stock; baseline +0.055%)
+
+| Window | Label | After selling delta | After buying delta |
+|---|---|---|---|
+| Bar | any | +0.03% … +0.07% | +0.03% … +0.06% (no pattern) |
+| Roll 4 | ABSORBED | **+0.093%** (t 4.3, 6/6) | +0.016% |
+| Roll 4 | STRONG | +0.070% | +0.042% |
+| Since 09:45 | **AGAINST** | **+0.118%** (t 4.9, 6/6) | **+0.117%** (t 4.2, 5/6) |
+| Since 09:45 | NORM | −0.039% (t −2.0) | −0.043% (t −1.8) |
+
+Same conclusion as before, with the new labels: single-bar labels carry no
+information; the only labels that stand out are Roll-4 ABSORBED selling and
+day-level AGAINST (price moved opposite to the net delta since the open),
+about +0.04% to +0.06% above baseline. The chart is for reading who is in
+control, not for generating signals.
