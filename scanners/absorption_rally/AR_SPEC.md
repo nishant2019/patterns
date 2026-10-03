@@ -72,7 +72,7 @@ scanner spec.
 | 17-09-2026 | −0.08% | 26 | 15 | +0.12% | +0.13% | 8 |
 | 18-09-2026 | +0.42% | 8 | 6 | +0.11% | −0.26% | 3 |
 
-All five days: 42 setups; vs market roughly +0.1% on average, driven by a few
+All five days: 42 setups; +0.20% vs market on average, driven by a few
 large winners (YATHARTH, SHREEJISPG, JSL). No clear edge yet.
 
 ## Known limitations
