@@ -1,4 +1,5 @@
 # Fading late breakouts on all 23 days
+> **Not a 30-minute trade:** this test enters at the 15:15 bar, which is only 15 minutes long. Parked; see NEW_EXTREME_30M_REPORT.md.
 `python scanners/afternoon_volatility/late_break_fade.py` (output: `late_break_fade_output.txt`). The late-break fade (E4) needs no watchlist history, so it uses every day in `data/ohlc` (1 Sep - 5 Oct, 23 days, 7,674 stock-days) instead of the 18 usable for the watchlist. No newer data was available. Rule unchanged from the earlier test: the 14:45 bar closes above the day's highest high / below its lowest low (of all bars before it); fade it (short up-breaks, long down-breaks), enter at the 15:15 open, exit at the close; 0.06% round trip. 990 events (12.9% of stock-days).
 
 | Cut | n | Gross | Net (0.06%) | t | Days positive |

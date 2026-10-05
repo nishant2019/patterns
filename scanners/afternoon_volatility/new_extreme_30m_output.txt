@@ -1,0 +1,78 @@
+6406 signal events over 23 days. Net = after 0.06% cost. 'H1/H2' = day-equal net in first/second half.
+
+BUY new day lows (reversal)
+  hold 1 bar
+    ALL slots n= 4285 gross -0.039% net -0.099% t -1.9 days+ 6/23  H1 -0.029 H2 -0.048
+    11:15    n=  569 gross -0.076% net -0.136% t -3.0 days+ 6/21  H1 -0.104 H2 -0.146
+    11:45    n=  712 gross -0.024% net -0.084% t -0.1 days+ 10/21  H1 +0.048 H2 -0.062
+    12:15    n=  562 gross -0.044% net -0.104% t -2.6 days+ 5/21  H1 -0.103 H2 -0.072
+    12:45    n=  597 gross -0.124% net -0.184% t -1.0 days+ 13/22  H1 -0.058 H2 -0.068
+    13:15    n=  738 gross -0.019% net -0.079% t -0.1 days+ 9/22  H1 -0.040 H2 +0.025
+    13:45    n=  620 gross +0.082% net +0.022% t +0.1 days+ 8/19  H1 -0.028 H2 +0.042
+    14:15    n=  487 gross -0.095% net -0.155% t -1.4 days+ 8/22  H1 -0.068 H2 -0.071
+  hold 2 bars
+    ALL slots n= 3798 gross -0.054% net -0.114% t +0.2 days+ 12/23  H1 +0.000 H2 +0.010
+    11:15    n=  569 gross -0.057% net -0.117% t -0.5 days+ 11/21  H1 +0.068 H2 -0.151
+    11:45    n=  712 gross -0.042% net -0.102% t -0.1 days+ 11/21  H1 +0.042 H2 -0.052
+    12:15    n=  562 gross -0.356% net -0.416% t -2.4 days+ 3/21  H1 -0.244 H2 -0.121
+    12:45    n=  597 gross -0.065% net -0.125% t -0.5 days+ 13/22  H1 -0.095 H2 -0.002
+    13:15    n=  738 gross +0.085% net +0.025% t +0.4 days+ 11/22  H1 -0.010 H2 +0.074
+    13:45    n=  620 gross +0.056% net -0.004% t +0.8 days+ 11/19  H1 -0.028 H2 +0.199
+
+SELL new day highs (reversal)
+  hold 1 bar
+    ALL slots n= 2121 gross -0.021% net -0.081% t -0.1 days+ 6/23  H1 +0.099 H2 -0.111
+    11:15    n=  441 gross -0.041% net -0.101% t -0.2 days+ 10/23  H1 +0.136 H2 -0.176
+    11:45    n=  333 gross -0.035% net -0.095% t -2.3 days+ 7/22  H1 -0.097 H2 -0.131
+    12:15    n=  315 gross -0.070% net -0.130% t -2.5 days+ 4/21  H1 -0.111 H2 -0.171
+    12:45    n=  273 gross +0.144% net +0.084% t +1.5 days+ 10/20  H1 +0.226 H2 +0.006
+    13:15    n=  205 gross -0.072% net -0.132% t -2.6 days+ 5/20  H1 -0.081 H2 -0.229
+    13:45    n=  270 gross -0.047% net -0.107% t -0.2 days+ 7/19  H1 +0.023 H2 -0.050
+    14:15    n=  284 gross -0.015% net -0.075% t -1.7 days+ 5/19  H1 -0.148 H2 -0.134
+  hold 2 bars
+    ALL slots n= 1837 gross -0.029% net -0.089% t +0.4 days+ 7/23  H1 +0.163 H2 -0.073
+    11:15    n=  441 gross -0.033% net -0.093% t -0.0 days+ 8/23  H1 +0.144 H2 -0.138
+    11:45    n=  333 gross -0.094% net -0.154% t -2.9 days+ 6/22  H1 -0.179 H2 -0.123
+    12:15    n=  315 gross +0.025% net -0.035% t -1.1 days+ 8/21  H1 +0.021 H2 -0.181
+    12:45    n=  273 gross +0.005% net -0.055% t -0.0 days+ 9/20  H1 +0.167 H2 -0.172
+    13:15    n=  205 gross -0.067% net -0.127% t -1.8 days+ 7/20  H1 -0.096 H2 -0.257
+    13:45    n=  270 gross -0.013% net -0.073% t +0.1 days+ 10/19  H1 +0.069 H2 -0.048
+
+SELL new day lows (continuation)
+  hold 1 bar
+    ALL slots n= 4285 gross +0.039% net -0.021% t -3.9 days+ 3/23  H1 -0.091 H2 -0.072
+    11:15    n=  569 gross +0.076% net +0.016% t +0.1 days+ 13/21  H1 -0.016 H2 +0.026
+    11:45    n=  712 gross +0.024% net -0.036% t -3.3 days+ 1/21  H1 -0.168 H2 -0.058
+    12:15    n=  562 gross +0.044% net -0.016% t -1.1 days+ 9/21  H1 -0.017 H2 -0.048
+    12:45    n=  597 gross +0.124% net +0.064% t -0.9 days+ 6/22  H1 -0.062 H2 -0.052
+    13:15    n=  738 gross +0.019% net -0.041% t -2.0 days+ 8/22  H1 -0.080 H2 -0.145
+    13:45    n=  620 gross -0.082% net -0.142% t -1.9 days+ 4/19  H1 -0.092 H2 -0.162
+    14:15    n=  487 gross +0.095% net +0.035% t -1.0 days+ 8/22  H1 -0.052 H2 -0.049
+  hold 2 bars
+    ALL slots n= 3798 gross +0.054% net -0.006% t -3.5 days+ 4/23  H1 -0.120 H2 -0.130
+    11:15    n=  569 gross +0.057% net -0.003% t -1.1 days+ 9/21  H1 -0.188 H2 +0.031
+    11:45    n=  712 gross +0.042% net -0.018% t -2.5 days+ 5/21  H1 -0.162 H2 -0.068
+    12:15    n=  562 gross +0.356% net +0.296% t +0.8 days+ 12/21  H1 +0.124 H2 +0.001
+    12:45    n=  597 gross +0.065% net +0.005% t -0.9 days+ 7/22  H1 -0.025 H2 -0.118
+    13:15    n=  738 gross -0.085% net -0.145% t -1.8 days+ 8/22  H1 -0.110 H2 -0.194
+    13:45    n=  620 gross -0.056% net -0.116% t -2.0 days+ 4/19  H1 -0.092 H2 -0.319
+
+BUY new day highs (continuation)
+  hold 1 bar
+    ALL slots n= 2121 gross +0.021% net -0.039% t -1.6 days+ 8/23  H1 -0.219 H2 -0.009
+    11:15    n=  441 gross +0.041% net -0.019% t -0.6 days+ 6/23  H1 -0.256 H2 +0.056
+    11:45    n=  333 gross +0.035% net -0.025% t -0.1 days+ 10/22  H1 -0.023 H2 +0.011
+    12:15    n=  315 gross +0.070% net +0.010% t +0.4 days+ 9/21  H1 -0.009 H2 +0.051
+    12:45    n=  273 gross -0.144% net -0.204% t -3.1 days+ 6/20  H1 -0.346 H2 -0.126
+    13:15    n=  205 gross +0.072% net +0.012% t +0.6 days+ 11/20  H1 -0.039 H2 +0.109
+    13:45    n=  270 gross +0.047% net -0.013% t -1.3 days+ 9/19  H1 -0.143 H2 -0.070
+    14:15    n=  284 gross +0.015% net -0.045% t +0.3 days+ 7/19  H1 +0.028 H2 +0.014
+  hold 2 bars
+    ALL slots n= 1837 gross +0.029% net -0.031% t -1.7 days+ 10/23  H1 -0.283 H2 -0.047
+    11:15    n=  441 gross +0.033% net -0.027% t -0.7 days+ 8/23  H1 -0.264 H2 +0.018
+    11:45    n=  333 gross +0.094% net +0.034% t +0.5 days+ 14/22  H1 +0.059 H2 +0.003
+    12:15    n=  315 gross -0.025% net -0.085% t -0.4 days+ 8/21  H1 -0.141 H2 +0.061
+    12:45    n=  273 gross -0.005% net -0.065% t -1.1 days+ 9/20  H1 -0.287 H2 +0.052
+    13:15    n=  205 gross +0.067% net +0.007% t +0.6 days+ 8/20  H1 -0.024 H2 +0.137
+    13:45    n=  270 gross +0.013% net -0.047% t -1.4 days+ 7/19  H1 -0.189 H2 -0.072
+

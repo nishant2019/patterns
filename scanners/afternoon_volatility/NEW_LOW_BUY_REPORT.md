@@ -1,4 +1,5 @@
 # Buying new day lows made in the 14:45 bar
+> **Not a 30-minute trade:** this test enters at the 15:15 bar, which is only 15 minutes long. Parked; see NEW_EXTREME_30M_REPORT.md.
 `python scanners/afternoon_volatility/new_low_buy.py` (output: `new_low_buy_output.txt`). 23 days (1 Sep - 5 Oct), 7,674 stock-days, 662 events.
 Signal: the 14:45 bar closes below the lowest low of every earlier bar that day. Trade: buy the 15:15 open, sell the 15:15 close (a 15-minute bar), 0.06% round trip. This hypothesis came out of a post-hoc cut in the previous test, so the same 23 days cannot confirm it on their own; stability checks below are the best this data allows.
 
