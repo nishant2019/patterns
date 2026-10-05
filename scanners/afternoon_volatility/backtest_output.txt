@@ -1,0 +1,39 @@
+Backtest 18 days (decision 14:15), 9124 stock-days. EXPAND = afternoon |move| / the stock's own usual; PM move = |14:15 open -> close| in %.
+
+By score decile (D10 = highest score), all days:
+ decile      n  EXPAND  PM move%  usual%
+      1    918    1.01      0.56    0.58
+      2    917    1.12      0.54    0.52
+      3    918    1.20      0.55    0.49
+      4    900    1.15      0.52    0.49
+      5    918    1.16      0.50    0.47
+      6    917    1.25      0.51    0.45
+      7    901    1.35      0.54    0.44
+      8    917    1.33      0.54    0.45
+      9    918    1.43      0.57    0.44
+     10    900    1.68      0.73    0.48
+
+Rank correlation score vs EXPAND per day (mean of daily Spearman, t clustered by day, days positive):
+  ALL   +0.105  (t +11.4, 18/18 days)
+  DISC  +0.096  (t +7.9, 9/9 days)
+  TEST  +0.113  (t +8.5, 9/9 days)
+
+Tier vs rest (afternoon move, % and x usual), by half:
+  ALL   HOT   n= 1823  PM move 0.64%  EXPAND 1.54  usual 0.46%
+  ALL   WARM  n=  844  PM move 0.55%  EXPAND 1.35  usual 0.45%
+  ALL   -     n= 6457  PM move 0.53%  EXPAND 1.18  usual 0.49%
+  DISC  HOT   n=  921  PM move 0.60%  EXPAND 1.52  usual 0.46%
+  DISC  WARM  n=  401  PM move 0.52%  EXPAND 1.35  usual 0.45%
+  DISC  -     n= 3241  PM move 0.49%  EXPAND 1.16  usual 0.47%
+  TEST  HOT   n=  902  PM move 0.67%  EXPAND 1.57  usual 0.46%
+  TEST  WARM  n=  443  PM move 0.57%  EXPAND 1.35  usual 0.45%
+  TEST  -     n= 3216  PM move 0.58%  EXPAND 1.20  usual 0.51%
+
+Calibration: multiple of 'usual' learned on discovery: {'HOT': 1.52, 'WARM': 1.35, '-': 1.16}
+  TEST HOT   predicted PM move 0.70%  actual 0.67%  (median actual / predicted 0.70)
+  TEST WARM  predicted PM move 0.61%  actual 0.57%  (median actual / predicted 0.69)
+  TEST -     predicted PM move 0.59%  actual 0.58%  (median actual / predicted 0.75)
+
+Turnover filter check: HOT tier EXPAND for turnover below / above the median (Rs crore):
+  below median 75 Cr: n=911 EXPAND 1.45
+  above median 75 Cr: n=912 EXPAND 1.63
