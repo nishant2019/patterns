@@ -35,7 +35,7 @@ def build():
             brk14 = 1 if tb[4] > r["hi"] else (-1 if tb[4] < r["lo"] else 0)
             brk45 = 1 if nb[4] > r["hi"] else (-1 if nb[4] < r["lo"] else 0)
             rows.append(dict(sym=sym, day=day, coils=r["coils"], W=q["width"] / prior["width"], Vr=q["vol"] / prior["vol"], expand=q["absmove"] / prior["absmove"],
-                             brk14=brk14 != 0, brk2=(brk14 != 0 or brk45 != 0), ret_after=(late[-1][4] / tb[4] - 1) * 100, brk=brk14))
+                             brk14=brk14 != 0, brk2=(brk14 != 0 or brk45 != 0), ret_after=(late[-1][4] / tb[4] - 1) * 100, brk=brk14, drift=(r["last"] / mid[0][1] - 1) * 100, pos=r["pos"], ret_open=(late[-1][4] / tb[1] - 1) * 100))
     return rows
 
 def main():

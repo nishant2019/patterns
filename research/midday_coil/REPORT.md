@@ -25,3 +25,21 @@ Absolute: tight stocks' late-session move is 1.11x their usual vs 1.34x for the 
 ## Verdict
 Neither hypothesis gives a trade signal. Useful as a *negative* filter: tight/dry midday coils are the stocks least likely to move in the last 90 minutes, so deprioritise them for afternoon trades. If anything, the stocks that did NOT go quiet (wider, higher-volume midday) carry the late-session movement.
 Caveats: 18 days, one market regime; the follow-through samples are small (about 200-350 breaks per half).
+
+# Part 2 - the stocks that did NOT go quiet (`active_midday.py`, output in `run_output_active.txt`)
+Groups fixed in advance (top third of that day's stocks): A LOUD (relative volume), B WIDE (relative width), C both, D no compressed bars. Same 18 days, 9/9 split.
+
+| Group | Late-session move vs own usual (group minus rest) | Break by 14:45 | Excess return 14:15 open -> close | Continues midday drift (MOMO) |
+|---|---|---|---|---|
+| A LOUD | +0.27x (17/18 days; disc +0.23, test +0.30) | -5.7 pts | +0.044% (t 2.7) | -0.009% (t -0.6) |
+| B WIDE | +0.28x (17/18; disc +0.27, test +0.28) | -12.5 pts | +0.058% (t 3.5) | -0.019% (t -1.0) |
+| C both | +0.34x (18/18; disc +0.33, test +0.35) | -11.6 pts | +0.060% (t 2.5) | -0.008% (t -0.3) |
+| D no coil bars | -0.01x | +0.4 pts | -0.006% | -0.018% (t -1.2) |
+
+1. **Activity persists (robust).** Stocks that were loud/wide at midday move 1.44-1.53x their usual in the last 90 minutes vs 1.27x for the average stock; the effect is on 17-18 of 18 days and in both halves. This is the mirror image of "quiet stays quiet": it is volatility clustering. Combined loud+wide is the strongest group (+0.34x).
+2. **But direction is not predictable.** Continuing the midday drift or the position in the midday range gives about -0.01 to -0.04% in every group, equal to the all-stock baseline (-0.016%, t -2.0, slight fade). Break-by-14:45 rates are *lower* for wide groups (their range is wide, harder to exceed).
+3. **A small positive excess return remains (+0.04 to +0.06% from 14:15 open to the close, t 2.5-3.5, positive in 14-15 of 18 days, both halves positive).** It does not look like beta (it is larger on market-down days: +0.09% vs +0.01%) but it is below a 0.06% round-trip cost, and it may partly reflect skew: the comparison is against the cross-sectional mean. Not a tradable edge by itself.
+4. "No compressed bars" (D) is not the same thing as "active": it shows nothing. The signal is in relative width and volume, not in the coil count.
+
+**Use:** relative midday width and volume (vs the stock's own prior days) tell you where afternoon *movement* will be (a volatility filter for choosing what to trade / how wide to place stops), not which way it will go. Direction still needs another reason.
+Caveats: 18 days, one regime; excess return not tested net of costs beyond the rough comparison above.
