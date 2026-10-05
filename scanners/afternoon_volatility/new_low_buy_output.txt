@@ -1,0 +1,44 @@
+7674 stock-days, 23 days; signal events: 662
+
+MAIN (buy at 15:15 open, sell at close):
+  new day low by 14:45 close                     n=  662 gross +0.114%  net +0.054%  day-equal net +0.064%  t +2.1  days+ 13/22  hit 52.0%
+    cost 0.03%                                   n=  662 gross +0.114%  net +0.084%  day-equal net +0.094%  t +3.1  days+ 15/22  hit 54.8%
+    cost 0.1%                                    n=  662 gross +0.114%  net +0.014%  day-equal net +0.024%  t +0.8  days+ 11/22  hit 46.1%
+
+Stability:
+  first 11 days                                  n=  363 gross +0.160%  net +0.100%  day-equal net +0.119%  t +2.8  days+ 8/11  hit 54.8%
+  last 12 days                                   n=  299 gross +0.059%  net -0.001%  day-equal net +0.009%  t +0.3  days+ 5/11  hit 48.5%
+  days 1-8                                       n=  201 gross +0.150%  net +0.090%  day-equal net +0.107%  t +2.0  days+ 5/8  hit 58.7%
+  days 9-16                                      n=  269 gross +0.103%  net +0.043%  day-equal net +0.026%  t +0.6  days+ 5/8  hit 48.3%
+  days 17-23                                     n=  192 gross +0.093%  net +0.033%  day-equal net +0.058%  t +1.2  days+ 3/6  hit 50.0%
+  events per day, top 5: [('2026-09-15', 151), ('2026-09-30', 74), ('2026-09-10', 49), ('2026-09-09', 35), ('2026-09-29', 32)]
+  leave-one-day-out net range: +0.038% .. +0.070%, day-equal t range +1.8 .. +2.4
+
+Permutation test (random same-day stocks, same count per day): observed mean gross +0.114%, random mean +0.023% (sd 0.017), one-sided p = 0.000
+
+Placebos (long, same entry/exit):
+  any red 14:45 bar                              n= 4222 gross +0.047%  net -0.013%  day-equal net -0.014%  t -1.0  days+ 11/23  hit 46.4%
+  near the day low, no new low (bottom 10% of range) n=  818 gross +0.037%  net -0.023%  day-equal net -0.020%  t -0.7  days+ 10/23  hit 42.9%
+  wick-only new low (low < prior lows, close above) n=  715 gross +0.024%  net -0.036%  day-equal net -0.036%  t -1.1  days+ 7/23  hit 43.5%
+  ALL stocks (baseline = last-bar drift)         n= 7674 gross +0.021%  net -0.039%  day-equal net -0.039%  t -2.9  days+ 9/23  hit 43.1%
+
+By context:
+  low turnover (<11 Cr)                          n=  221 gross +0.108%  net +0.048%  day-equal net +0.057%  t +1.3  days+ 13/21  hit 53.8%
+  mid turnover                                   n=  221 gross +0.147%  net +0.087%  day-equal net +0.061%  t +1.8  days+ 12/19  hit 51.6%
+  high turnover (>28 Cr)                         n=  220 gross +0.088%  net +0.028%  day-equal net -0.006%  t -0.2  days+ 10/19  hit 50.5%
+  price < 200                                    n=  177 gross +0.105%  net +0.045%  day-equal net +0.018%  t +0.4  days+ 10/20  hit 53.1%
+  price 200-1000                                 n=  404 gross +0.110%  net +0.050%  day-equal net +0.060%  t +2.2  days+ 11/21  hit 50.7%
+  price >= 1000                                  n=   81 gross +0.156%  net +0.096%  day-equal net -0.011%  t -0.2  days+ 4/9  hit 55.6%
+  breadth = % of stocks making a new low at 14:45 (median day 7.5%)
+  broad-selloff days (breadth above median)      n=  510 gross +0.119%  net +0.059%  day-equal net +0.050%  t +1.4  days+ 6/11  hit 52.5%
+  narrow days (breadth below median)             n=  152 gross +0.100%  net +0.040%  day-equal net +0.078%  t +1.6  days+ 7/11  hit 50.0%
+  market down into the close (14:45 bar weak days) n/a: use next-bar market up n=  485 gross +0.155%  net +0.095%  day-equal net +0.095%  t +2.8  days+ 11/15  hit 56.5%
+  days when market last bar down                 n=  177 gross +0.004%  net -0.056%  day-equal net -0.001%  t -0.0  days+ 2/7  hit 39.5%
+  lower wick on the 14:45 bar >= 40% (rejection) n=  124 gross +0.108%  net +0.048%  day-equal net +0.017%  t +0.4  days+ 9/16  hit 55.6%
+  closed at the bar low (close_pos <= 20%)       n=  294 gross +0.114%  net +0.054%  day-equal net +0.117%  t +2.1  days+ 13/21  hit 50.3%
+  small break (<= 0.15%)                         n=  221 gross +0.130%  net +0.070%  day-equal net +0.078%  t +2.0  days+ 13/20  hit 56.1%
+  large break                                    n=  220 gross +0.207%  net +0.147%  day-equal net +0.141%  t +2.9  days+ 12/18  hit 57.7%
+  volume of 14:45 bar >= 2x earlier average      n=  356 gross +0.137%  net +0.077%  day-equal net +0.069%  t +2.3  days+ 13/21  hit 52.5%
+
+Market-neutral: subtract each day's mean last-bar return
+  excess gross +0.091%  day-equal t +3.5  days+ 16/22
