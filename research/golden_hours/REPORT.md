@@ -23,13 +23,13 @@ The first pass used the 7 CVD days; this is the re-run on the larger OHLC set (s
 ## Findings
 1. **Golden hours: 09:15, 09:45, 10:15, then 14:45.** 09:15 carries 16.5% of the day's volume and moves >0.5% in 63% of stock-days; 14:45 carries 14.9%. Both are above the stock's day average on 23/23 and 14/23 days; 09:45 on 23/23. Together 09:15-10:15 and 14:45 hold ~48% of the day's volume in 4 of 13 bars.
 2. **Coil zone: 11:45-14:15, deepest 12:15-12:45.** Volume 68-72% of a normal bar, 13-19% of bars move >0.5%, and 23-27% of bars are compressed (range < 0.6x the stock's median bar). Every midday slot was below the stock's day-average range on 21-23 of 23 days. 12:45 is the quietest slot.
-3. **Coils persist, then release late.** After a compressed midday bar, the next bar is compressed again 24-34% of the time and expands (>1.5x median) only 8-11% of the time. Expansion shows up at 14:45 (22% after a coil, with 5% coil share): stocks with 3+ compressed bars between 11:15 and 13:45 had a bigger 14:45 bar (range index 1.19 vs 1.05 for 1-2 coil bars and 0.96 for none) and had broken their midday range by 14:15 in 28% of cases (19% / 14%). Midday coil stocks are the watchlist for 14:15-14:45; this does not say which side breaks.
+3. **Coils persist, but do NOT lead to a late expansion (corrected).** After a compressed midday bar, the next bar is compressed again 24-34% of the time. An earlier version of this report said stocks with 3+ compressed midday bars had a bigger 14:45 bar and broke their range more often (28% vs 14%). **That was a look-ahead artefact**: coil bars were defined against the full-day median, which includes the late bars. Re-tested point-in-time (`scanners/midday_coil`): the share of stocks whose 14:15 bar closes beyond the midday range is 19% in every group (0, 1-2, 3 and 4-5 coil bars), and the 14:15/14:45 bar ranges of coiled stocks are 0.98/0.99x their own usual (vs 1.04/1.03x for stocks with no coil bars). The "Expand after coil" column in the table also uses the full-day median and should be read as descriptive only.
 4. **Direction is not predictable by slot.** Market-neutral momentum (a bar's direction vs the next bar, after removing that day-slot's average stock move) is ~49% everywhere; 09:45 (47.4%), 14:45 (48.4%) and 15:15 (46%, t -4.9) lean to reversal, positive on only 5-8 of 23 days. Breakout-bar follow-through is ~0 or negative (15:15 -0.06%, t -5.8). Raw hit rates in the 7-day CVD data (62% at 10:45) were market-wide co-movement.
 5. **Costs:** a 0.06% round trip is ~3% of a 09:15 bar's range (1.9%) but ~10% of a midday bar's range (0.56-0.62%). Midday trades start with a much bigger handicap.
 
 ## How to use it
 - Trade in the active windows (09:15-10:15, 14:45); stand aside or size down 12:15-13:45.
-- Build the midday watchlist from stocks with 3+ compressed bars (coil range = levels) and check it from 14:15.
+- A midday coil watchlist can be built (`scanners/midday_coil`) and gives clean levels, but it showed no edge in the 23-day point-in-time test.
 - Do not use "previous bar up/down" as a signal; if anything, the last bars of the day fade.
 
 ## Caveats

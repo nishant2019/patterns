@@ -39,10 +39,7 @@ def main():
     for r in rows: r["score"] = 100 * (1 - st.mean(k[r["slot"]] for k in rk) / (len(rows) - 1))
     print("\nOpportunity score (mean rank of RangeIdx, Move>0.5%, VolIdx, low Coil%, Eff):")
     for r in sorted(rows, key=lambda r: -r["score"]): print(f"  {r['slot']:6s} {r['score']:5.0f}  {r['label']}")
-    lc = coil_to_late()
-    print("\nMidday coil (11:15-13:45) -> later activity (RangeIdx, breakout of the midday range at 14:15):")
-    for g, v in sorted(lc.items()):
-        print(f"  {g:26s} n={len(v):5d}  14:15 RangeIdx {st.mean(x[0] for x in v):.2f}  14:45 RangeIdx {st.mean(x[1] for x in v):.2f}  |14:15->14:45 move| {st.mean(x[2] for x in v):.2f}%  broke midday range by 14:15: {st.mean(x[3] for x in v)*100:.0f}%")
+    # NOTE: the old 'midday coil -> 14:45 expansion' check used full-day medians (look-ahead) and was removed; see scanners/midday_coil for the point-in-time test.
     # ---- HTML heat matrix
     cols = [("Range%", "Avg range %", "{:.2f}", False), ("RangeIdx", "Range index", "{:.2f}", False), ("VolIdx", "Volume index", "{:.2f}", False), ("Vol%day", "% of day volume", "{:.1f}", False),
             ("Move>0.5%", "Bars moving >0.5%", "{:.0f}%", False), ("Eff", "Body/range", "{:.2f}", False), ("Chop%", "Chop bars", "{:.0f}%", True),

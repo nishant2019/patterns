@@ -1,0 +1,15 @@
+Backtest 23 days, decision 14:15 (signal = T-bar close; outcomes from that close to the day close)
+group                   n |  T-bar close breaks midday range | T-bar range idx | 14:45 bar range idx | |move| T-open->close
+0 coil bars          2964 |                             18% |            1.10 |                1.47 |                0.52%
+1-2 coil bars        7189 |                             19% |            1.00 |                1.34 |                0.54%
+3 coil bars          1235 |                             19% |            0.90 |                1.21 |                0.54%
+4-5 coil bars         251 |                             18% |            0.87 |                1.14 |                0.55%
+WATCHLIST (3+)       1486 |                             19% |            0.90 |                1.20 |                0.54%
+ALL STOCKS          11639 |                             19% |            1.01 |                1.35 |                0.53%
+
+Direction after a break (signed: + = continued in the break direction; excess = minus that day's mean stock move after T-bar close):
+  WATCHLIST (3+)     n_breaks=  276 mean raw +0.027%  excess -0.007% (t +0.6, 13/23 days positive)
+  4-5 coil bars      n_breaks=   44 mean raw -0.006%  excess -0.002% (t -0.6, 6/17 days positive)
+  1-2 coil bars      n_breaks= 1394 mean raw -0.005%  excess -0.048% (t -1.0, 8/23 days positive)
+  0 coil bars        n_breaks=  536 mean raw +0.017%  excess -0.031% (t -1.8, 8/23 days positive)
+  ALL STOCKS         n_breaks= 2206 mean raw +0.004%  excess -0.039% (t -1.4, 7/23 days positive)

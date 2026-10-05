@@ -28,9 +28,4 @@ Opportunity score (mean rank of RangeIdx, Move>0.5%, VolIdx, low Coil%, Eff):
   13:45     32  COIL ZONE
   12:15     15  COIL ZONE
   12:45      5  COIL ZONE
-
-Midday coil (11:15-13:45) -> later activity (RangeIdx, breakout of the midday range at 14:15):
-  1-2 coil bars              n= 6971  14:15 RangeIdx 0.80  14:45 RangeIdx 1.05  |14:15->14:45 move| 0.50%  broke midday range by 14:15: 19%
-  3+ coil bars 11:15-13:45   n= 1641  14:15 RangeIdx 0.92  14:45 RangeIdx 1.19  |14:15->14:45 move| 0.60%  broke midday range by 14:15: 28%
-  no coil bars               n= 3026  14:15 RangeIdx 0.73  14:45 RangeIdx 0.96  |14:15->14:45 move| 0.41%  broke midday range by 14:15: 14%
 wrote /home/user/patterns/research/golden_hours/golden_hours.html
