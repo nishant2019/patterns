@@ -1,0 +1,34 @@
+9104 stock-days, 18 usable days (2026-09-08 .. 2026-10-05); discovery 9 days, test 9 days
+
+Group minus rest, averaged over days (t clustered by day, days positive). Positive = group has MORE of the metric.
+
+H1 TIGHT (bottom third relative width)
+  EXPAND (|move| vs own usual)       | ALL  -0.227 (t -8.9, 0/18d, n=3047) | DISC  -0.221 (t -6.8, 0/9d, n=1521) | TEST  -0.232 (t -5.9, 0/9d, n=1526)
+  BREAK at 14:15 close (pct pts)     | ALL  +5.859 (t +3.8, 15/18d, n=3047) | DISC  +3.437 (t +3.0, 8/9d, n=1521) | TEST  +8.282 (t +3.2, 7/9d, n=1526)
+  BREAK2 by 14:45 close (pct pts)    | ALL +13.092 (t +7.9, 18/18d, n=3047) | DISC +10.273 (t +5.1, 9/9d, n=1521) | TEST +15.910 (t +7.1, 9/9d, n=1526)
+  FOLLOW after break (excess %)      | ALL  +0.025 (t +1.0, 11/17d, n=681) | DISC  -0.011 (t -0.3, 5/9d, n=330) | TEST  +0.066 (t +2.9, 6/8d, n=351)
+
+H2 DRY-UP (bottom third relative volume)
+  EXPAND (|move| vs own usual)       | ALL  -0.226 (t -7.8, 0/18d, n=3047) | DISC  -0.193 (t -5.5, 0/9d, n=1521) | TEST  -0.259 (t -6.0, 0/9d, n=1526)
+  BREAK at 14:15 close (pct pts)     | ALL  +2.161 (t +2.3, 13/18d, n=3047) | DISC  +0.870 (t +0.8, 6/9d, n=1521) | TEST  +3.452 (t +2.5, 7/9d, n=1526)
+  BREAK2 by 14:45 close (pct pts)    | ALL  +5.749 (t +5.5, 16/18d, n=3047) | DISC  +5.048 (t +3.2, 7/9d, n=1521) | TEST  +6.451 (t +4.9, 9/9d, n=1526)
+  FOLLOW after break (excess %)      | ALL  +0.080 (t +1.9, 11/18d, n=626) | DISC  +0.038 (t +0.7, 4/9d, n=304) | TEST  +0.123 (t +1.9, 7/9d, n=322)
+
+H3 BOTH tight and dry
+  EXPAND (|move| vs own usual)       | ALL  -0.243 (t -6.9, 0/18d, n=1826) | DISC  -0.211 (t -5.7, 0/9d, n=934) | TEST  -0.274 (t -4.7, 0/9d, n=892)
+  BREAK at 14:15 close (pct pts)     | ALL  +4.991 (t +3.2, 15/18d, n=1826) | DISC  +3.210 (t +1.6, 6/9d, n=934) | TEST  +6.772 (t +3.1, 9/9d, n=892)
+  BREAK2 by 14:45 close (pct pts)    | ALL +11.099 (t +6.8, 17/18d, n=1826) | DISC  +8.828 (t +3.6, 8/9d, n=934) | TEST +13.371 (t +7.2, 9/9d, n=892)
+  FOLLOW after break (excess %)      | ALL  +0.036 (t +1.4, 11/17d, n=414) | DISC  +0.025 (t +0.9, 6/9d, n=204) | TEST  +0.048 (t +1.1, 5/8d, n=210)
+
+Absolute levels (all days): 
+  H1 TIGHT (bottom third relative width)   n= 3047  EXPAND 1.11 vs 1.34 | BREAK@14:15 23.0% vs 17.2% | BREAK by 14:45 46.6% vs 33.5%
+  H2 DRY-UP (bottom third relative volume) n= 3047  EXPAND 1.12 vs 1.34 | BREAK@14:15 20.5% vs 18.4% | BREAK by 14:45 41.7% vs 36.0%
+  H3 BOTH tight and dry                    n= 1826  EXPAND 1.07 vs 1.31 | BREAK@14:15 23.2% vs 18.1% | BREAK by 14:45 46.9% vs 35.6%
+
+Inside the 3+ coil watchlist (n=1144): tight vs not / dry vs not, EXPAND and BREAK2:
+  H1 TIGHT (bottom third relative wi n= 377 EXPAND 1.07 vs 1.31 | BREAK2 42.4% vs 35.3%
+  H2 DRY-UP (bottom third relative v n= 381 EXPAND 0.98 vs 1.35 | BREAK2 35.4% vs 38.8%
+  H3 BOTH tight and dry              n= 218 EXPAND 0.95 vs 1.29 | BREAK2 39.9% vs 37.1%
+
+Correlation of coil count with relative width / relative volume (all stock-days):
+  corr(coils, W) -0.05   corr(coils, Vr) -0.01   corr(W, Vr) +0.41
