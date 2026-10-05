@@ -16,3 +16,12 @@ Discovery = 4 days, test = 3 days; t-stats clustered by (day, bar) because stock
 ## Verdict
 CVD candle shapes describe what happened (who was aggressive, whether it was absorbed) – they are not standalone entry signals.
 Use them as context (regime, levels, absorption labels), not as triggers. Not tested: intraday-to-close horizon, combining with levels, costs.
+
+## Part 2 – patterns at key levels (`cvd_levels_study.py`)
+Levels (point-in-time): master 09:15 range, running day high/low, running VWAP. Touch = bar extreme within 0.2% of the level, closing on the right side.
+Bullish patterns at support / bearish at resistance, outcome signed in the implied direction, vs same-bar mean stock. 42 combos, 7 days, discovery 4 / test 3.
+- Touching a level alone: no edge (|move| ≤ 0.02% over 2 bars).
+- Pattern + level: 3 combos had |t|≥2 in discovery (chance ≈ 2), **0 replicated**.
+- Only recurring hint: "CVD makes a new low but price doesn't" at VWAP/master-low support: +0.05–0.06% over 2 bars, +0.07–0.09% to close
+  (t 2.1–2.6 pooled, n≈740 each, ~5.6 trading days positive in discovery, weaker on test). Same effect as in the pattern-only study; a hypothesis for more data, not an edge after costs.
+- Bearish patterns at resistance: nothing (even slightly wrong-signed).
