@@ -17,7 +17,22 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "scanners", "oab"))
 from oab_scanner import load
 
-def stockdays():
+def stockdays(source="ohlc"):
+    """source='ohlc': data/ohlc/<SYM>_<from>_<to>_30m.csv (timestamp,open,high,low,close,volume; ~23 days, price+volume only, CVD fields zeroed).
+    source='cvd' : data/CVD_Scanner_<date>/ (7 days with CVD)."""
+    if source == "ohlc":
+        import csv
+        for p in sorted(glob.glob(os.path.join(HERE, "..", "..", "data", "ohlc", "*_30m.csv"))):
+            sym = os.path.basename(p).split("_")[0]; byday = collections.defaultdict(list)
+            for r in csv.DictReader(open(p)):
+                try: byday[r["timestamp"][:10]].append((r["timestamp"], float(r["open"]), float(r["high"]), float(r["low"]), float(r["close"]), float(r["volume"])))
+                except ValueError: continue
+            for day, bars in byday.items():
+                if len(bars) < 12: continue
+                bars.sort(); z = [0.0] * len(bars)
+                yield day, sym, {"Time": [b[0] for b in bars], "open_price": [b[1] for b in bars], "high_price": [b[2] for b in bars], "low_price": [b[3] for b in bars],
+                                 "close_price": [b[4] for b in bars], "volume": [b[5] for b in bars], "open_cvd": z, "high_cvd": z, "low_cvd": z, "close_cvd": z}
+        return
     for folder in sorted(glob.glob(os.path.join(HERE, "..", "..", "data", "CVD_Scanner_*"))):
         date = folder.rsplit("_", 1)[1]
         for p in glob.glob(os.path.join(folder, "*.csv")):
@@ -36,7 +51,7 @@ def main():
         n = len(C); slots = [t[11:16] for t in d["Time"]]
         rng = [(H[i] - L[i]) / O[i] * 100 for i in range(n)]
         mr, mv, md = st.mean(rng), st.mean(V), st.median(rng)
-        if mr <= 0 or mv <= 0: continue
+        if mr <= 0 or mv <= 0 or md <= 0 or min(O) <= 0: continue
         ret = [(C[i] - O[i]) / O[i] * 100 for i in range(n)]
         store.append((date, sym, slots, ret, [H[i] for i in range(n)], [L[i] for i in range(n)], list(C)))
         for i in range(n):
@@ -51,7 +66,7 @@ def main():
             if i >= 1 and coil[i - 1]:
                 acc[s]["coil2"].append(coil[i]); acc[s]["expand"].append(rng[i] > 1.5 * md)
             if i < n - 1:
-                D = (cc[i] - oc[i]) / V[i] * 100
+                D = (cc[i] - oc[i]) / V[i] * 100 if V[i] else 0
                 if abs(D) >= 30:
                     nD = cc[i + 1] - oc[i + 1]
                     acc[slots[i + 1]]["cvdpers"].append((nD > 0) == (D > 0))
