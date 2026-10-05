@@ -137,6 +137,10 @@ def swing_state(b, table, avgv):
     return lab, rng / avgv * 100, pct, ratio
 
 
+sys.path.insert(0, os.path.join(HERE, '..', 'cvd_patterns'))
+from flow_flags import flow_flag
+
+
 def build(sym, date, tables):
     d = load(os.path.join(HERE, "..", "..", "data", f"CVD_Scanner_{date}", f"{sym}_{date}.csv"))
     n = len(d["close_price"])
@@ -151,6 +155,7 @@ def build(sym, date, tables):
         b["day"] = state(*window(d, 1, i)[:2], tables["day"]) if i >= 3 else ("", None)
         b["sw"] = swing_state(b, tables["swing"], sum(V) / n)
         b["mh"] = maha_state(D, (1 if D > 0 else -1) * P, V[i] / (sum(V[:i]) / i), tables["maha"]) if i >= 1 else ("-", None, "")
+        b["fl"] = flow_flag(d, i)
         bars.append(b)
     return d, bars
 
@@ -251,10 +256,21 @@ def render(sym, date, bars):
         s.append(f'<g><title>{b["t"]} Mahalanobis distance {"n/a" if mhd is None else format(mhd, ".1f")}{" - OUTLIER, driver " + mhdrv if mhl == "OUTLIER" else ""}</title><rect x="{x-step*.46:.1f}" y="{y}" width="{step*.92:.1f}" height="38" rx="4" style="fill:{fill}"/>'
                  f'<text x="{x:.1f}" y="{y+16}" class="chip{cl_}" text-anchor="middle">{t1}</text>'
                  f'<text x="{x:.1f}" y="{y+31}" class="chip2{cl_}" text-anchor="middle">{t2}</text></g>')
+    y = E0 + 250
+    s.append(f'<text x="{left-8}" y="{y+22}" class="pan" text-anchor="end">CVD flow</text>')
     for b in bars:
-        s.append(f'<text x="{X(b["i"]):.1f}" y="{E0+256}" class="ax" text-anchor="middle">{b["t"]}</text>')
+        fc, fs, fD, fdesc = b["fl"]; x = X(b["i"])
+        fill = {"BUY": "var(--up)", "SELL": "var(--dn)", "QUIET": "var(--norm)", "-": "var(--none)"}[fc]
+        t1 = "-" if fc == "-" else ("QUIET" if fc == "QUIET" else ("%s%s" % (fc, "+" if fs else "")))
+        t2 = "" if fc == "-" else ("narrower" if fc == "QUIET" else "continues")
+        n_ = " n" if fc == "-" else ""
+        s.append(f'<g><title>{b["t"]} delta {fD:+.0f}% of volume. {fdesc or "no flow flag"}</title><rect x="{x-step*.46:.1f}" y="{y}" width="{step*.92:.1f}" height="38" rx="4" style="fill:{fill}"/>'
+                 f'<text x="{x:.1f}" y="{y+16}" class="chip{n_}" text-anchor="middle">{t1}</text>'
+                 f'<text x="{x:.1f}" y="{y+31}" class="chip2{n_}" text-anchor="middle">{t2}</text></g>')
+    for b in bars:
+        s.append(f'<text x="{X(b["i"]):.1f}" y="{E0+306}" class="ax" text-anchor="middle">{b["t"]}</text>')
     # legend
-    lx = left; ly = E0 + 282
+    lx = left; ly = E0 + 332
     for name, var, desc in (("STRONG", "var(--over)", "z <= -2 efficient"), ("NORM", "var(--norm)", "|z| < 2"), ("ABSORBED", "var(--ineff)", "z >= +2"),
                             ("AGAINST", "var(--against)", "z >= +2, price opposed"), ("-", "var(--none)", "|delta| < 10%")):
         s.append(f'<rect x="{lx}" y="{ly-10}" width="14" height="14" rx="3" style="fill:{var}"/><text x="{lx+20}" y="{ly+2}" class="lg">{name}: {desc}</text>')
@@ -265,7 +281,8 @@ def render(sym, date, bars):
     s.append(f'<rect x="{lx+700}" y="{ly-9}" width="11" height="11" class="mk mh"/><text x="{lx+718}" y="{ly+2}" class="lg">joint (Mahalanobis) outlier, below the candle</text>')
     s.append(f'<text x="{left}" y="{ly+28}" class="sub">Efficiency = robust z-score of the price move vs bars with similar |delta|. +z = moved less than usual (absorbed); -z = moved more; |z| >= 2 flagged.</text>')
     s.append(f'<text x="{left}" y="{ly+46}" class="sub">Swing = CVD high-low as % of avg bar volume (TWO-WAY: top 20%, netted to 30% or less). Joint outlier = Mahalanobis d > 3.06.</text>')
-    H_ = E0 + 400
+    s.append(f'<text x="{left}" y="{ly+64}" class="sub">CVD flow: BUY/SELL = |bar delta| >= 30% of volume, next bar usually continues (+ = bullish marubozu / three white soldiers). QUIET = CVD doji/spinning top, next bar narrower. About the flow, not price direction.</text>')
+    H_ = E0 + 500
     css = """
 :root{--bg:#fff;--fg:#1f2430;--mut:#6b7280;--grid:#e5e7eb;--box:#f8fafc;--band:#2563eb18;--up:#14a085;--dn:#e0463f;--over:#3b82f6;--norm:#9ca3af;--ineff:#f59e0b;--against:#e11d74;--none:#e5e7eb;--master:#6366f1;--chipfg:#fff;--swing:#9333ea;--maha:#0891b2}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f141c;--fg:#e5e7eb;--mut:#94a3b8;--grid:#243040;--box:#131a24;--band:#3b82f622;--up:#2dd4a4;--dn:#f87171;--over:#3b82f6;--norm:#6b7280;--ineff:#f59e0b;--against:#ec4899;--none:#2a3441;--master:#6366f1;--swing:#c084fc;--maha:#22d3ee}}
