@@ -30,7 +30,9 @@ def label(r, allr):
 
 def main():
     rows = G.main()
-    for r in rows: r["label"] = label(r, rows)
+    for r in rows:
+        r["label"] = label(r, rows)
+        if r["Coil%"] < 3: r["Coil2%"] = r["Expand%"] = float("nan")
     def rank(key, rev=True):
         s = sorted(rows, key=lambda r: r[key], reverse=rev); return {r["slot"]: i for i, r in enumerate(s)}
     rk = [rank("RangeIdx"), rank("Move>0.5%"), rank("VolIdx"), rank("Coil%", False), rank("Eff")]
@@ -60,7 +62,7 @@ def main():
     css = "body{font-family:system-ui,sans-serif;margin:20px;color:#1f2430;background:#fff}h1{font-size:20px;margin:0 0 4px}p{font-size:12px;color:#6b7280;margin:4px 0 12px;max-width:1100px}table{border-collapse:collapse;font-size:12px}th,td{padding:7px 9px;text-align:center;border:1px solid #fff}th{font-size:11px;color:#6b7280;font-weight:600;max-width:78px}td.s{font-weight:700;text-align:left}.t{color:#fff;font-size:10px;font-weight:700;padding:3px 7px;border-radius:4px;white-space:nowrap}"
     n = rows[0]["n"]; ndays = rows[0]["Days>mean"].split("/")[1]
     html = (f"<!doctype html><html><head><meta charset=utf-8><title>Golden hours</title><style>{css}</style></head><body><h1>Golden hours &amp; coiling hours - 30-minute slots</h1>"
-            f"<p>{n} stock-days per slot . Green = better for the column's goal (more movement, more volume, less coiling), red = worse. Range/volume index are relative to each stock's own day average (1.0 = average bar). Coil bar = range below 0.6x that stock's median bar. 15:15* is a 15-minute bar. Opportunity score = mean rank of range index, share of >0.5% bars, volume index, low coil share and body/range.</p>"
+            f"<p>{n} stock-days per slot ({ndays} trading days, 506 stocks). Green = better for the column's goal (more movement, more volume, less coiling), red = worse. Range/volume index are relative to each stock's own day average (1.0 = average bar). Coil bar = range below 0.6x that stock's median bar. 15:15* is a 15-minute bar. Opportunity score = mean rank of range index, share of >0.5% bars, volume index, low coil share and body/range.</p>"
             + "".join(h) + "<p>Movement and coiling are reliable (they repeat on every day); bar-to-bar direction is not: after removing the market-wide move, a bar's direction does not predict the next bar in most slots (about 49%); 09:45, 14:45 and 15:15 lean mildly to reversal (46-48%).</p></body></html>")
     out = os.path.join(HERE, "golden_hours.html"); open(out, "w").write(html)
     subprocess.run(["/opt/pw-browsers/chromium-1194/chrome-linux/chrome", "--headless=new", "--no-sandbox", "--disable-gpu", "--hide-scrollbars", f"--screenshot={os.path.join(HERE, 'golden_hours.png')}", "--window-size=1320,700", "file://" + out], check=True, capture_output=True)
