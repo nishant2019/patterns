@@ -1,0 +1,37 @@
+days: ['15-09-2026', '16-09-2026', '17-09-2026', '18-09-2026', '28-09-2026', '29-09-2026', '01-10-2026'] 
+discovery: ['15-09-2026', '16-09-2026', '17-09-2026', '18-09-2026'] test: ['01-10-2026', '28-09-2026', '29-09-2026']
+
+29 patterns, 126434 pattern-bars. Outcome = next-2-bar return minus the cross-sectional MEAN stock (%).
+pattern                                                 n |         ALL 2bar |           DISC |           TEST | 1bar
+S CVD new low, price not (absorption)                5123 | +0.016% t +2.1 | +0.012 t+1.7 | +0.022 t+1.3 | +0.003 t+0.7
+C1 CVD candle DOWN                                  15706 | +0.007% t +2.1 | +0.007 t+1.7 | +0.006 t+1.2 | +0.002 t+1.0
+C2 CVD reversal up through prior high                2221 | -0.018% t -1.8 | -0.032 t-2.3 | +0.001 t-0.2 | -0.008 t-0.8
+C1 big body DOWN (|D|>=30%)                          5800 | +0.021% t +1.7 | +0.015 t+0.8 | +0.028 t+1.7 | +0.013 t+1.9
+C1 divergence: CVD up, price down                    2574 | -0.007% t -1.5 | +0.021 t+1.8 | -0.046 t-3.0 | +0.002 t-0.6
+S new day-low CVD close                              6432 | +0.013% t +1.4 | +0.003 t+0.6 | +0.025 t+1.4 | +0.007 t+0.8
+C2 bullish CVD engulfing                             2770 | -0.016% t -1.3 | -0.021 t-1.2 | -0.008 t-0.7 | -0.012 t-1.0
+C2 CVD reversal down through prior low               2365 | +0.010% t +1.3 | -0.001 t-0.0 | +0.024 t+1.6 | -0.001 t+0.5
+C1 marubozu CVD down                                 6288 | +0.016% t +1.2 | +0.018 t+1.0 | +0.013 t+0.8 | +0.008 t+1.8
+C1 CVD candle UP                                    12662 | -0.008% t -1.2 | -0.009 t-1.3 | -0.008 t-0.5 | -0.002 t-0.3
+C1 CVD hammer (long lower wick)                      3270 | -0.010% t -1.1 | -0.013 t-1.0 | -0.006 t-0.5 | -0.010 t-1.1
+C1 marubozu CVD up                                   4309 | -0.008% t -1.1 | -0.022 t-2.0 | +0.010 t+0.5 | -0.004 t-0.9
+C2 bearish CVD engulfing                             3053 | +0.005% t +1.0 | -0.006 t+0.1 | +0.018 t+1.2 | -0.003 t-0.1
+C1 divergence: CVD down, price up                    2527 | -0.003% t +0.9 | -0.013 t+0.2 | +0.012 t+1.1 | +0.000 t+1.1
+C2 CVD outside bar                                   3036 | +0.012% t +0.9 | +0.015 t+1.2 | +0.008 t-0.1 | +0.007 t+0.6
+C3 three CVD down candles                            6132 | -0.000% t +0.8 | -0.003 t+0.3 | +0.004 t+0.8 | -0.002 t+0.0
+C1 doji (|D|<5%)                                     3760 | +0.006% t +0.8 | -0.001 t-0.0 | +0.016 t+1.1 | -0.003 t-0.6
+C3 CVD lower highs+lows                              7214 | +0.002% t +0.7 | -0.006 t-0.4 | +0.013 t+1.5 | -0.001 t+0.4
+S CVD new high, price not (bull divergence)          3809 | -0.007% t -0.6 | +0.003 t+0.7 | -0.020 t-1.4 | -0.001 t-0.1
+C3 CVD higher highs+lows                             4332 | -0.010% t -0.5 | -0.015 t-0.7 | -0.003 t-0.1 | -0.004 t-0.5
+C3 three CVD up candles                              3698 | -0.002% t -0.4 | -0.007 t-0.2 | +0.005 t-0.4 | -0.000 t-0.1
+C3 CVD morning star                                   660 | -0.027% t -0.4 | -0.020 t+0.3 | -0.039 t-0.9 | -0.018 t-0.5
+S new day-high CVD close                             3869 | +0.000% t -0.4 | -0.009 t-0.2 | +0.012 t-0.3 | +0.000 t-0.2
+C1 CVD shooting star (long upper wick)               2948 | +0.000% t +0.4 | +0.016 t+1.2 | -0.022 t-0.8 | -0.001 t+0.4
+C1 big body UP (|D|>=30%)                            3625 | -0.001% t +0.3 | -0.004 t+0.1 | +0.005 t+0.2 | +0.002 t+0.2
+S price new high, CVD not (bear divergence)          1267 | -0.043% t -0.2 | -0.053 t-1.0 | -0.021 t+1.2 | -0.021 t+0.1
+C2 CVD inside bar                                    4445 | +0.005% t +0.2 | +0.018 t+1.5 | -0.015 t-1.0 | +0.000 t-0.4
+S price new low, CVD not (bull divergence)           1883 | -0.018% t +0.2 | +0.028 t+1.4 | -0.064 t-1.6 | -0.018 t-0.6
+C3 CVD evening star                                   656 | -0.001% t +0.1 | -0.006 t+0.6 | +0.006 t-0.6 | +0.017 t+0.7
+
+Discovery |t|>=2: 2 patterns; same sign AND test |t|>=1.65: 0
+Chance expectation of |t|>=2 among 29 null patterns: ~1.5
