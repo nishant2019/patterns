@@ -1,0 +1,46 @@
+42 level x pattern combos. Signed excess return (%), clustered t. TOL=0.2%
+combo                                                    n |           2-bar |          DISC |          TEST | to close
+vwap support + CVD new low, price not                  737 | +0.060% t +2.6 | +0.045 t+2.2 | +0.091 t+1.6 | +0.089% t+2.6
+master support + CVD new low, price not                753 | +0.052% t +2.3 | +0.078 t+2.3 | +0.024 t+0.8 | +0.066% t+2.1
+vwap resist: touch only                               5023 | +0.004% t +2.1 | +0.009 t+1.7 | -0.002 t+1.3 | -0.010% t+0.1
+day support + CVD hammer                               549 | +0.028% t +1.6 | +0.043 t+1.5 | +0.014 t+0.8 | +0.063% t+2.0
+day support: touch only                               4372 | -0.005% t -1.5 | +0.004 t-1.0 | -0.016 t-1.1 | -0.013% t+0.2
+day resist + CVD down, price up                        225 | -0.024% t -1.4 | -0.045 t-1.7 | +0.029 t-0.2 | +0.075% t-0.6
+day resist + CVD shooting star                         325 | +0.027% t +1.4 | -0.008 t+0.6 | +0.095 t+1.5 | -0.021% t+0.1
+day support + big CVD body up                          487 | +0.002% t +1.3 | -0.013 t+0.8 | +0.025 t+1.1 | +0.012% t+1.4
+master support + ANY bull pattern                     1568 | +0.021% t +1.2 | +0.030 t+1.3 | +0.010 t+0.3 | +0.030% t+1.5
+master resist: touch only                             2254 | +0.002% t -1.1 | +0.002 t-1.3 | +0.001 t-0.1 | -0.008% t-1.9
+vwap support: touch only                              4479 | +0.009% t +1.1 | +0.009 t+2.1 | +0.010 t+0.1 | -0.009% t+0.6
+vwap resist + CVD shooting star                        516 | +0.010% t +1.1 | -0.009 t+0.6 | +0.036 t+0.9 | +0.037% t+1.3
+day resist + bearish CVD engulfing                     310 | +0.026% t +1.0 | +0.023 t+1.0 | +0.032 t+0.6 | +0.071% t+1.7
+vwap support + ANY bull pattern                       2358 | +0.015% t +1.0 | +0.011 t+1.9 | +0.022 t-0.0 | -0.004% t+0.4
+day resist + ANY bear pattern                         1482 | +0.019% t +1.0 | -0.006 t-1.4 | +0.061 t+1.8 | +0.030% t+0.3
+day resist: touch only                                2666 | +0.024% t +1.0 | +0.009 t-0.8 | +0.051 t+1.9 | +0.060% t+0.8
+vwap resist + big CVD body down                       1312 | -0.012% t -0.9 | -0.009 t-0.5 | -0.016 t-0.8 | -0.036% t-1.1
+day resist + big CVD body down                         326 | +0.033% t +0.9 | +0.007 t-0.5 | +0.090 t+1.5 | +0.042% t+0.3
+master support: touch only                            2679 | +0.012% t +0.9 | +0.015 t+0.7 | +0.010 t+0.5 | +0.027% t+1.7
+day support + CVD up, price down                       415 | +0.025% t +0.8 | +0.071 t+1.2 | -0.032 t-1.2 | +0.045% t+1.5
+master support + CVD hammer                            321 | +0.044% t +0.8 | +0.028 t+0.2 | +0.058 t+0.8 | +0.088% t+1.5
+master resist + ANY bear pattern                      1260 | -0.008% t -0.7 | -0.009 t-1.4 | -0.006 t+0.4 | -0.024% t-1.9
+master resist + CVD down, price up                     179 | -0.021% t -0.7 | -0.042 t-1.5 | +0.018 t+0.6 | +0.017% t+0.1
+master resist + CVD shooting star                      257 | +0.008% t +0.7 | -0.005 t-0.1 | +0.033 t+1.5 | +0.010% t+0.4
+vwap resist + CVD down, price up                       455 | +0.011% t +0.5 | +0.014 t+0.0 | +0.007 t+0.8 | -0.008% t-0.5
+master resist + big CVD body down                      340 | -0.006% t -0.5 | -0.006 t-1.2 | -0.008 t+0.9 | -0.052% t-1.2
+vwap support + CVD hammer                              487 | -0.002% t +0.5 | -0.017 t+0.5 | +0.023 t+0.2 | +0.010% t+1.8
+day support + CVD new low, price not                  1189 | +0.024% t +0.5 | +0.040 t+1.3 | +0.005 t-0.5 | -0.018% t-0.9
+master resist + CVD new high, price not                544 | -0.002% t -0.5 | +0.014 t-0.9 | -0.026 t+0.1 | -0.003% t-1.2
+master resist + bearish CVD engulfing                  247 | +0.020% t -0.5 | +0.025 t-0.2 | +0.013 t-0.5 | +0.011% t-0.6
+vwap resist + bearish CVD engulfing                    601 | +0.016% t -0.5 | +0.039 t-0.3 | -0.012 t-0.4 | +0.027% t+0.9
+vwap resist + ANY bear pattern                        2832 | -0.004% t +0.4 | +0.000 t-0.0 | -0.009 t+0.7 | -0.010% t-0.5
+day resist + CVD new high, price not                   708 | +0.019% t +0.4 | +0.009 t-1.5 | +0.033 t+1.2 | +0.015% t-0.3
+day support + bullish CVD engulfing                    472 | -0.023% t +0.4 | +0.008 t+1.5 | -0.059 t-2.1 | -0.017% t+1.1
+vwap support + big CVD body up                         788 | -0.013% t +0.4 | -0.005 t+0.9 | -0.023 t-0.2 | -0.069% t-0.7
+master support + CVD up, price down                    264 | -0.015% t +0.3 | +0.027 t+1.0 | -0.062 t-1.5 | +0.028% t+0.9
+vwap resist + CVD new high, price not                  643 | -0.011% t +0.2 | +0.006 t+0.0 | -0.034 t+0.3 | -0.019% t-0.8
+day support + ANY bull pattern                        2412 | +0.007% t -0.2 | +0.025 t+0.8 | -0.013 t-1.0 | +0.001% t+0.6
+master support + bullish CVD engulfing                 302 | -0.023% t -0.2 | -0.027 t+0.5 | -0.018 t-1.0 | -0.041% t+0.2
+vwap support + bullish CVD engulfing                   533 | +0.013% t +0.2 | -0.002 t-0.6 | +0.033 t+1.2 | -0.025% t+0.4
+vwap support + CVD up, price down                      440 | +0.021% t +0.2 | +0.043 t+1.7 | -0.005 t-1.1 | -0.028% t+0.0
+master support + big CVD body up                       388 | +0.001% t +0.1 | -0.010 t-0.2 | +0.014 t+0.3 | -0.031% t-0.5
+
+Discovery |t|>=2: 3; replicate same sign with test |t|>=1.65: 0; chance ~2.1

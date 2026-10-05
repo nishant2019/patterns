@@ -12,6 +12,8 @@ from regime_scanner import analyse, NAMES, PLAN, TIMES
 sys.path.insert(0, os.path.join(HERE, "..", "absorption"))
 from efficiency_chart import peer_tables, maha_state, window  # joint-outlier test (Mahalanobis)
 from regime_study import structure
+sys.path.insert(0, os.path.join(HERE, "..", "cvd_patterns"))
+from flow_flags import flow_flag
 
 # Historical statistics from REPORT.md (6 days, pooled over six decision times; vs the median stock)
 STATS = {
@@ -73,6 +75,7 @@ def rows_for(folder, t, tables=None):
         n = len(d["close_price"]); C = d["close_price"]
         r["to_close"] = (C[11] - C[t]) / C[t] * 100 if n > 11 else None
         r["size_out"] = size_outliers(d, t, tables)
+        r["flow"] = flow_flag(d, t)
         out.append(r)
     return out
 
@@ -101,6 +104,11 @@ def table(k, rs, outcomes):
         if r["inside"] >= 3: notes.append(f"<span class=flag>coil {r['inside']} bars</span>")
         so = [x for x in r.get("size_out", []) if x["combo"]]
         if so: notes.append(f"<span class=flag style='border-color:var(--E);color:var(--E)'>SIZE sell outlier {so[-1]['time']}</span>")
+        fc, fs, fD, fdesc = r.get("flow", ("-", "", 0, ""))
+        if fc in ("BUY", "SELL"):
+            col = "var(--E)" if fc == "BUY" else "var(--D)"
+            notes.append(f"<span class=flag title='{fdesc}' style='border-color:{col};color:{col}'>FLOW {fc}{'+' if fs else ''} {fD:+.0f}%</span>")
+        elif fc == "QUIET": notes.append(f"<span class=flag title='{fdesc}'>QUIET</span>")
         cls = lambda v: "pos" if v > 0 else "neg"
         cells = [f"<td>{html.escape(r['symbol'])}</td>", f"<td>{r['close']:g}</td>", f"<td>{r['master_low']:g} – {r['master_high']:g}</td>",
                  f"<td>{('above high' if r['struct'].startswith('ABOVE') else 'below low' if r['struct'].startswith('BELOW') else r['struct'].replace('inside, ', '') + ' ' + format(r['pos']*100, '.0f') + '%')}</td>",
@@ -154,7 +162,7 @@ def render(date, tm, rows, top, outcomes):
             if len(rs) > top: body.append(f"<details><summary>Show the other {len(rs)-top} stocks</summary>{table(k, rs[top:], outcomes)}</details>")
         else: body.append("<p class=stat>No stocks in this regime.</p>")
         body.append("</section>")
-    body.append("<p class=note>Edges are small and relative to the median stock (regime A about +0.11% above a +0.06% baseline, before costs), measured over 7 trading days and shrinking as days are added. Use the regimes to decide where to look and what to avoid, not as automatic entries. Rankings: A upper-third first then heaviest absorbed selling; B closest to a master edge; C largest move; D most selling; D2 closest to the master low; E heaviest buying.</p>")
+    body.append("<p class=note>Edges are small and relative to the median stock (regime A about +0.11% above a +0.06% baseline, before costs), measured over 7 trading days and shrinking as days are added. Use the regimes to decide where to look and what to avoid, not as automatic entries. Flags on the last bar: FLOW BUY/SELL = |delta| >= 30% of volume, the next bar usually continues the same way (selling about 65%, buying about 56%; + = bullish marubozu / three white soldiers); QUIET = CVD doji or spinning top, next bar usually narrower. They describe flow persistence, not price direction (no price edge found). Rankings: A upper-third first then heaviest absorbed selling; B closest to a master edge; C largest move; D most selling; D2 closest to the master low; E heaviest buying.</p>")
     return f"<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>Regime summary {pdate} {tm}</title><style>{CSS}</style></head><body><main>{''.join(body)}</main></body></html>"
 
 def main():

@@ -1,0 +1,4 @@
+big   bar delta UP  : next bar same sign 55.6% (n=4482)
+big   bar delta DOWN: next bar same sign 64.7% (n=6784)
+small bar delta UP  : next bar same sign 53.5% (n=6958)
+small bar delta DOWN: next bar same sign 60.3% (n=7703)

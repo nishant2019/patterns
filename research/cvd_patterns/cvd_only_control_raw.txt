@@ -1,0 +1,30 @@
+pattern                                  n | raw dDelta1 |  residual (beyond own delta)  t
+three white soldiers                  1189 |     +14.85% |      +5.21%  t +5.3
+bullish marubozu                      2226 |     +11.21% |      +2.93%  t +2.7
+morning star                           276 |      +2.57% |      -3.75%  t -2.3
+three outside down                    1639 |      +4.27% |      -2.13%  t -2.0
+three outside up                      1191 |      +6.04% |      -1.94%  t -1.9
+bullish three-line strike              182 |      -0.76% |      -5.69%  t -1.6
+piercing line                          332 |      +5.45% |      +4.07%  t +1.6
+hanging man                            215 |      -8.27% |      -5.13%  t -1.4
+dragonfly doji                         193 |      -0.75% |      -1.03%  t -1.4
+tweezer top                            793 |      +0.51% |      -1.86%  t -1.4
+gravestone doji                        174 |      +2.83% |      +4.00%  t +1.2
+evening star                           262 |      +0.71% |      -3.05%  t -1.1
+bearish belt hold                     1002 |      +3.94% |      -1.82%  t -1.0
+hammer                                 335 |      -4.36% |      -3.58%  t -1.0
+tweezer bottom                         866 |      +3.50% |      +1.04%  t +0.9
+dark cloud cover                       324 |      -0.85% |      -2.05%  t -0.9
+inverted hammer                        267 |      -2.72% |      -3.59%  t -0.7
+bearish marubozu                      3508 |      +9.62% |      +0.84%  t -0.4
+bearish engulfing                     2660 |      +2.94% |      +0.08%  t -0.3
+bearish counterattack-ish (open=prev close, close<prev open)  2660 |      +2.94% |      +0.08%  t -0.3
+bullish engulfing                     2433 |      +5.13% |      +0.35%  t -0.3
+bullish counterattack-ish (open=prev close, close>prev open)  2433 |      +5.13% |      +0.35%  t -0.3
+on-neck                                624 |      +3.90% |      -0.64%  t -0.3
+bullish belt hold                      919 |      +5.61% |      -0.04%  t -0.3
+bearish three-line strike              163 |      +3.44% |      -0.97%  t +0.2
+three black crows                     2357 |     +11.24% |      +2.42%  t -0.1
+shooting star                          227 |      -1.30% |      +2.40%  t +0.1
+
+4/27 patterns still |t|>=2 after controlling for own delta + prior delta (chance ~1.4)
