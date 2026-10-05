@@ -11,7 +11,7 @@
 | E1/E2 breakouts, no watchlist | REST | 466 / 896 | -0.012% / -0.044% | 52.8 / 49.6 | ~0 |
 
 - **Buying the breakout loses**, and it loses more on the volatility watchlist than elsewhere (HOT+WARM -0.11 to -0.16% per trade vs -0.01 to -0.04% in REST). Gross of cost the watchlist breakouts are about -0.05 to -0.10%: the stocks that are moving most tend to give some of it back after the break. Stops do not help (slightly worse; hit rate falls to 38-40%).
-- **The fade is flat to slightly positive gross, but only in the test half and not net:** E1/E2 fades on HOT+WARM make +0.04 to 0.04% net on average (t about 0.1-0.5; discovery -0.08 to -0.09%, test +0.13 to +0.19%), so the sign flips between halves. Gross (before cost) the fade is about +0.10-0.12% on the watchlist, +0.09% for E4 fades across all stocks.
+- **The fade is flat to slightly positive gross, but only in the test half and not net:** E1/E2 fades on HOT+WARM net -0.007% / +0.038% per trade (t +0.1 / +0.5); discovery -0.09% / -0.08%, test +0.13% / +0.19%, so the sign flips between halves. Gross (before cost) the fade is about +0.10-0.12% on the watchlist, +0.09% for E4 fades across all stocks.
 - **Late breakouts (E4) reverse most reliably:** continuing a 14:45 breakout loses -0.15% net across all stocks (t -7.2, 1 of 18 days positive, both halves negative); fading it earns +0.03% net / +0.09% gross (hit 55%), but it is not significant (t +1.0) and is a 15-minute trade.
 - **Gate (net of cost > 0 in both halves and test t >= 2): nothing passes** (44 combinations, about 1 chance pass expected).
 
