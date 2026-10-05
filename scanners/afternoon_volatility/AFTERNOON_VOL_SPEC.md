@@ -29,4 +29,4 @@ python scanners/afternoon_volatility/afternoon_vol_scanner.py --backtest
 - HOT stocks with turnover above the median show a larger multiple (1.63x) than below (1.45x), so prefer liquid names.
 
 ## Limits
-Direction is not predicted (see `research/midday_coil/REPORT.md`: no continuation of midday drift, excess return after breaks about 0). 18 days, one regime. The usual-move baseline needs history, so the first 5 days per stock are unusable.
+Direction is not predicted (8 direction filters tested, none passes: `DIRECTION_REPORT.md`; see `research/midday_coil/REPORT.md`: no continuation of midday drift, excess return after breaks about 0). 18 days, one regime. The usual-move baseline needs history, so the first 5 days per stock are unusable.
